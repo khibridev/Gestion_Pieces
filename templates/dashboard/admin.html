@@ -6,10 +6,128 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>🏢 Bienvenue {{ request.user.username }} !</h2>
-        <p>Vous êtes connecté en tant qu <strong>Administrateur</strong></p>
-        <a href="{% url 'logout' %}" class="btn btn-danger">Se déconnecter</a>
+<nav class="navbar navbar-dark bg-dark px-4">
+    <span class="navbar-brand">🏢 Domicohouse - Admin</span>
+    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Se déconnecter</a>
+</nav>
+<div class="container mt-4">
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <h5>👥 Clients</h5>
+                    <h2>{{ total_clients }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <h5>📄 Contrats actifs</h5>
+                    <h2>{{ contrats_actifs }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow">
+                <div class="card-body">
+                    <h5>⏳ En attente</h5>
+                    <h2>{{ contrats_en_attente }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger shadow">
+                <div class="card-body">
+                    <h5>❌ Impayés</h5>
+                    <h2>{{ paiements_impayes }}</h2>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Liens rapides -->
+    <div class="row mb-4">
+        <div class="col">
+            <a href="{% url 'liste_clients' %}" class="btn btn-primary me-2">👥 Clients</a>
+            <a href="{% url 'liste_contrats' %}" class="btn btn-success me-2">📄 Contrats</a>
+            <a href="{% url 'liste_paiements' %}" class="btn btn-warning me-2">💰 Paiements</a>
+        </div>
+    </div>
+
+    <!-- Derniers clients -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5>👥 Derniers Clients</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Type Société</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in derniers_clients %}
+                    <tr>
+                        <td>{{ client.nom }} {{ client.prenom }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>{{ client.type_societe }}</td>
+                        <td>{{ client.date_inscription|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">Aucun client</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Derniers contrats -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h5>📄 Derniers Contrats</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Numéro</th>
+                        <th>Client</th>
+                        <th>Pack</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrat in derniers_contrats %}
+                    <tr>
+                        <td>{{ contrat.numero }}</td>
+                        <td>{{ contrat.client }}</td>
+                        <td>{{ contrat.pack }}</td>
+                        <td>
+                            {% if contrat.statut == 'actif' %}
+                                <span class="badge bg-success">Actif</span>
+                            {% elif contrat.statut == 'expire' %}
+                                <span class="badge bg-danger">Expiré</span>
+                            {% elif contrat.statut == 'en_attente' %}
+                                <span class="badge bg-warning">En attente</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Résilié</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center">Aucun contrat</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 </body>
 </html>

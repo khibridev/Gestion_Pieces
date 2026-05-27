@@ -1,62 +1,59 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des Paiements</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>💰 Liste des Paiements</h2>
-        <a href="{% url 'ajouter_paiement' %}" class="btn btn-success">➕ Ajouter</a>
-    </div>
-    <div class="card shadow">
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Contrat</th>
-                        <th>Montant</th>
-                        <th>Date</th>
-                        <th>Mode</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for paiement in paiements %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ paiement.contrat.numero }}</td>
-                        <td>{{ paiement.montant }} DH</td>
-                        <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
-                        <td>{{ paiement.mode }}</td>
-                        <td>
-                            {% if paiement.statut == 'paye' %}
-                                <span class="badge bg-success">Payé</span>
-                            {% elif paiement.statut == 'impaye' %}
-                                <span class="badge bg-danger">Impayé</span>
-                            {% else %}
-                                <span class="badge bg-warning">En attente</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'detail_paiement' paiement.pk %}" class="btn btn-sm btn-info">👁️</a>
-                            <a href="{% url 'modifier_paiement' paiement.pk %}" class="btn btn-sm btn-warning">✏️</a>
-                            <a href="{% url 'supprimer_paiement' paiement.pk %}" class="btn btn-sm btn-danger"
-                               onclick="return confirm('Supprimer ce paiement ?')">🗑️</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="7" class="text-center text-muted">Aucun paiement trouvé</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary mt-3">⬅️ Retour</a>
+{% extends 'base.html' %}
+{% block title %}Liste des Paiements{% endblock %}
+{% block page_title %}💰 Paiements{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Liste des Paiements</h4>
+    <a href="{% url 'ajouter_paiement' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Ajouter
+    </a>
 </div>
-</body>
-</html>
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Contrat</th>
+                    <th>Montant</th>
+                    <th>Date</th>
+                    <th>Mode</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ paiement.contrat.numero }}</td>
+                    <td>{{ paiement.montant }} DH</td>
+                    <td>{{ paiement.date_paiement|date:"d/m/Y" }}</td>
+                    <td>{{ paiement.mode }}</td>
+                    <td>
+                        {% if paiement.statut == 'paye' %}
+                            <span class="badge bg-success">Payé</span>
+                        {% elif paiement.statut == 'impaye' %}
+                            <span class="badge bg-danger">Impayé</span>
+                        {% else %}
+                            <span class="badge bg-warning">En attente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'detail_paiement' paiement.pk %}" class="btn btn-sm btn-info">👁️</a>
+                        <a href="{% url 'modifier_paiement' paiement.pk %}" class="btn btn-sm btn-warning">✏️</a>
+                        <a href="{% url 'supprimer_paiement' paiement.pk %}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('Supprimer ce paiement ?')">🗑️</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">Aucun paiement trouvé</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

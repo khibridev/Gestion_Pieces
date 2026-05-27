@@ -15,6 +15,8 @@ def dashboard_admin(request):
     total_paiements = Paiement.objects.count()
     paiements_payes = Paiement.objects.filter(statut='paye').count()
     paiements_impayes = Paiement.objects.filter(statut='impaye').count()
+    contrats_resilies = Contrat.objects.filter(statut='resilie').count()
+    paiements_en_attente = Paiement.objects.filter(statut='en_attente').count()
     
     # Derniers clients ajoutés
     derniers_clients = Client.objects.order_by('-date_inscription')[:5]
@@ -33,6 +35,9 @@ def dashboard_admin(request):
         'paiements_impayes': paiements_impayes,
         'derniers_clients': derniers_clients,
         'derniers_contrats': derniers_contrats,
+        'contrats_resilies': contrats_resilies,
+        'paiements_en_attente': paiements_en_attente,
+
     }
     return render(request, 'dashboard/admin.html', context)
 

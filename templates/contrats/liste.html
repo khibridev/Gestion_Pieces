@@ -1,66 +1,63 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des Contrats</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>📄 Liste des Contrats</h2>
-        <a href="{% url 'ajouter_contrat' %}" class="btn btn-success">➕ Ajouter</a>
-    </div>
-    <div class="card shadow">
-        <div class="card-body">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Numéro</th>
-                        <th>Client</th>
-                        <th>Pack</th>
-                        <th>Début</th>
-                        <th>Fin</th>
-                        <th>Statut</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for contrat in contrats %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ contrat.numero }}</td>
-                        <td>{{ contrat.client }}</td>
-                        <td>{{ contrat.pack }}</td>
-                        <td>{{ contrat.date_debut|date:"d/m/Y" }}</td>
-                        <td>{{ contrat.date_fin|date:"d/m/Y" }}</td>
-                        <td>
-                            {% if contrat.statut == 'actif' %}
-                                <span class="badge bg-success">Actif</span>
-                            {% elif contrat.statut == 'expire' %}
-                                <span class="badge bg-danger">Expiré</span>
-                            {% elif contrat.statut == 'en_attente' %}
-                                <span class="badge bg-warning">En attente</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Résilié</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'detail_contrat' contrat.pk %}" class="btn btn-sm btn-info">👁️</a>
-                            <a href="{% url 'modifier_contrat' contrat.pk %}" class="btn btn-sm btn-warning">✏️</a>
-                            <a href="{% url 'supprimer_contrat' contrat.pk %}" class="btn btn-sm btn-danger"
-                               onclick="return confirm('Supprimer ce contrat ?')">🗑️</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="8" class="text-center text-muted">Aucun contrat trouvé</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <a href="{% url 'dashboard_admin' %}" class="btn btn-secondary mt-3">⬅️ Retour</a>
+{% extends 'base.html' %}
+{% block title %}Liste des Contrats{% endblock %}
+{% block page_title %}📄 Contrats{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Liste des Contrats</h4>
+    <a href="{% url 'ajouter_contrat' %}" class="btn btn-success">
+        <i class="fas fa-plus"></i> Ajouter
+    </a>
 </div>
-</body>
-</html>
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Numéro</th>
+                    <th>Client</th>
+                    <th>Pack</th>
+                    <th>Début</th>
+                    <th>Fin</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contrat in contrats %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ contrat.numero }}</td>
+                    <td>{{ contrat.client }}</td>
+                    <td>{{ contrat.pack }}</td>
+                    <td>{{ contrat.date_debut|date:"d/m/Y" }}</td>
+                    <td>{{ contrat.date_fin|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if contrat.statut == 'actif' %}
+                            <span class="badge bg-success">Actif</span>
+                        {% elif contrat.statut == 'expire' %}
+                            <span class="badge bg-danger">Expiré</span>
+                        {% elif contrat.statut == 'en_attente' %}
+                            <span class="badge bg-warning">En attente</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Résilié</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'detail_contrat' contrat.pk %}" class="btn btn-sm btn-info">👁️</a>
+                        <a href="{% url 'modifier_contrat' contrat.pk %}" class="btn btn-sm btn-warning">✏️</a>
+                        <a href="{% url 'supprimer_contrat' contrat.pk %}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('Supprimer ce contrat ?')">🗑️</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">Aucun contrat trouvé</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -63,3 +63,32 @@ def supprimer_paiement(request, pk):
 def detail_paiement(request, pk):
     paiement = get_object_or_404(Paiement, pk=pk)
     return render(request, 'paiements/detail.html', {'paiement': paiement})
+import openpyxl
+from django.http import HttpResponse
+
+@login_required
+@admin_only
+def export_excel_paiements(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Paiements"
+
+    headers = ['Contrat', 'Client', 'Montant', 'Date', 'Mode', 'Statut']
+    ws.append(headers)
+
+    for paiement in Paiement.objects.all():
+        ws.append([
+            paiement.contrat.numero,
+            str(paiement.contrat.client),
+            float(paiement.montant),
+            paiement.date_paiement.strftime('%d/%m/%Y'),
+            paiement.mode,
+            paiement.statut,
+        ])
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename="paiements.xlsx"'
+    wb.save(response)
+    return response

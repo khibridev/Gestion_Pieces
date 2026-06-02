@@ -19,6 +19,9 @@
         </table>
         <a href="{% url 'modifier_contrat' contrat.pk %}" class="btn btn-warning">✏️ Modifier</a>
         <a href="{% url 'liste_contrats' %}" class="btn btn-secondary">⬅️ Retour</a>
+        <a href="{% url 'imprimer_contrat' contrat.pk %}" class="btn btn-danger" target="_blank">
+            <i class="fas fa-print"></i> Imprimer
+        </a>
     </div>
 </div>
 {% endblock %}

@@ -7,4 +7,5 @@ urlpatterns = [
     path('modifier/<int:pk>/', views.modifier_client, name='modifier_client'),
     path('supprimer/<int:pk>/', views.supprimer_client, name='supprimer_client'),
     path('detail/<int:pk>/', views.detail_client, name='detail_client'),
+    path('export/excel/', views.export_excel_clients, name='export_excel_clients'),
 ]

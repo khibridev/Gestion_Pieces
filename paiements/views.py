@@ -1,13 +1,26 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Paiement
 
-@login_required
-def liste_paiements(request):
-    paiements = Paiement.objects.all()
-    return render(request, 'paiements/liste.html', {'paiements': paiements})
+admin_only = user_passes_test(lambda u: u.is_staff, login_url='/login/')
 
 @login_required
+@admin_only
+def liste_paiements(request):
+    query = request.GET.get('q', '')
+    paiements = Paiement.objects.all()
+    if query:
+        paiements = paiements.filter(
+            contrat__numero__icontains=query
+        ) | paiements.filter(
+            contrat__client__nom__icontains=query
+        ) | paiements.filter(
+            contrat__client__prenom__icontains=query
+        )
+    return render(request, 'paiements/liste.html', {'paiements': paiements, 'query': query})
+
+@login_required
+@admin_only
 def ajouter_paiement(request):
     from contrats.models import Contrat
     contrats = Contrat.objects.all()
@@ -23,6 +36,7 @@ def ajouter_paiement(request):
     return render(request, 'paiements/ajouter.html', {'contrats': contrats})
 
 @login_required
+@admin_only
 def modifier_paiement(request, pk):
     from contrats.models import Contrat
     paiement = get_object_or_404(Paiement, pk=pk)
@@ -38,12 +52,14 @@ def modifier_paiement(request, pk):
     return render(request, 'paiements/modifier.html', {'paiement': paiement, 'contrats': contrats})
 
 @login_required
+@admin_only
 def supprimer_paiement(request, pk):
     paiement = get_object_or_404(Paiement, pk=pk)
     paiement.delete()
     return redirect('liste_paiements')
 
 @login_required
+@admin_only
 def detail_paiement(request, pk):
     paiement = get_object_or_404(Paiement, pk=pk)
     return render(request, 'paiements/detail.html', {'paiement': paiement})

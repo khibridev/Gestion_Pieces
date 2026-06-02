@@ -9,9 +9,17 @@
         <i class="fas fa-plus"></i> Ajouter
     </a>
 </div>
+
+<!-- Recherche -->
+<div class="card shadow-sm mb-3">
+    <div class="card-body py-2">
+        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Rechercher un contrat...">
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0" id="contratsTable">
             <thead class="table-dark">
                 <tr>
                     <th>#</th>
@@ -60,4 +68,16 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#contratsTable tbody tr');
+    rows.forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(filter) ? '' : 'none';
+    });
+});
+</script>
 {% endblock %}

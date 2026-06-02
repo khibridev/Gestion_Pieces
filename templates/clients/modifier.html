@@ -1,63 +1,47 @@
 {% extends 'base.html' %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Modifier un Client</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <div class="card shadow" style="max-width: 600px; margin: auto;">
-        <div class="card-header bg-warning">
-            <h4>✏️ Modifier le Client</h4>
-        </div>
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label">Nom</label>
-                    <input type="text" name="nom" class="form-control" 
-                           value="{{ client.nom }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Prénom</label>
-                    <input type="text" name="prenom" class="form-control" 
-                           value="{{ client.prenom }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" 
-                           value="{{ client.email }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Téléphone</label>
-                    <input type="text" name="telephone" class="form-control" 
-                           value="{{ client.telephone }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">CIN</label>
-                    <input type="text" name="cin" class="form-control" 
-                           value="{{ client.cin }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Type de Société</label>
-                    <select name="type_societe" class="form-select" required>
-                        <option value="SARL" {% if client.type_societe == 'SARL' %}selected{% endif %}>SARL</option>
-                        <option value="SAS" {% if client.type_societe == 'SAS' %}selected{% endif %}>SAS</option>
-                        <option value="Auto-entrepreneur" {% if client.type_societe == 'Auto-entrepreneur' %}selected{% endif %}>Auto-entrepreneur</option>
-                        <option value="Autre" {% if client.type_societe == 'Autre' %}selected{% endif %}>Autre</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-warning w-100">
-                    💾 Enregistrer les modifications
-                </button>
-            </form>
-        </div>
+{% block title %}Modifier un Client{% endblock %}
+{% block page_title %}👥 Modifier un Client{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm" style="max-width:600px; margin:auto;">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0">✏️ Modifier le Client</h5>
     </div>
-    <a href="{% url 'liste_clients' %}" class="btn btn-secondary mt-3">
-        ⬅️ Retour à la liste
-    </a>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" name="nom" class="form-control" value="{{ client.nom }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text" name="prenom" class="form-control" value="{{ client.prenom }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="{{ client.email }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Téléphone</label>
+                <input type="text" name="telephone" class="form-control" value="{{ client.telephone }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">CIN</label>
+                <input type="text" name="cin" class="form-control" value="{{ client.cin }}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Type de Société</label>
+                <select name="type_societe" class="form-select" required>
+                    <option value="SARL" {% if client.type_societe == 'SARL' %}selected{% endif %}>SARL</option>
+                    <option value="SAS" {% if client.type_societe == 'SAS' %}selected{% endif %}>SAS</option>
+                    <option value="Auto-entrepreneur" {% if client.type_societe == 'Auto-entrepreneur' %}selected{% endif %}>Auto-entrepreneur</option>
+                    <option value="Autre" {% if client.type_societe == 'Autre' %}selected{% endif %}>Autre</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-warning w-100">💾 Enregistrer</button>
+        </form>
+    </div>
 </div>
-</body>
-</html>
+<a href="{% url 'liste_clients' %}" class="btn btn-secondary mt-3">⬅️ Retour</a>
+{% endblock %}

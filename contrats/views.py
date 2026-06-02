@@ -1,13 +1,26 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Contrat
 
-@login_required
-def liste_contrats(request):
-    contrats = Contrat.objects.all()
-    return render(request, 'contrats/liste.html', {'contrats': contrats})
+admin_only = user_passes_test(lambda u: u.is_staff, login_url='/login/')
 
 @login_required
+@admin_only
+def liste_contrats(request):
+    query = request.GET.get('q', '')
+    contrats = Contrat.objects.all()
+    if query:
+        contrats = contrats.filter(
+            numero__icontains=query
+        ) | contrats.filter(
+            client__nom__icontains=query
+        ) | contrats.filter(
+            client__prenom__icontains=query
+        )
+    return render(request, 'contrats/liste.html', {'contrats': contrats, 'query': query})
+
+@login_required
+@admin_only
 def ajouter_contrat(request):
     from clients.models import Client
     clients = Client.objects.all()
@@ -25,6 +38,7 @@ def ajouter_contrat(request):
     return render(request, 'contrats/ajouter.html', {'clients': clients})
 
 @login_required
+@admin_only
 def modifier_contrat(request, pk):
     from clients.models import Client
     contrat = get_object_or_404(Contrat, pk=pk)
@@ -42,12 +56,14 @@ def modifier_contrat(request, pk):
     return render(request, 'contrats/modifier.html', {'contrat': contrat, 'clients': clients})
 
 @login_required
+@admin_only
 def supprimer_contrat(request, pk):
     contrat = get_object_or_404(Contrat, pk=pk)
     contrat.delete()
     return redirect('liste_contrats')
 
 @login_required
+@admin_only
 def detail_contrat(request, pk):
     contrat = get_object_or_404(Contrat, pk=pk)
     return render(request, 'contrats/detail.html', {'contrat': contrat})

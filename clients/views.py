@@ -1,15 +1,28 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Client
 
-# Liste des clients
-@login_required
-def liste_clients(request):
-    clients = Client.objects.all()
-    return render(request, 'clients/liste.html', {'clients': clients})
+admin_only = user_passes_test(lambda u: u.is_staff, login_url='/login/')
 
-# Ajouter un client
 @login_required
+@admin_only
+def liste_clients(request):
+    query = request.GET.get('q', '')
+    clients = Client.objects.all()
+    if query:
+        clients = clients.filter(
+            nom__icontains=query
+        ) | clients.filter(
+            prenom__icontains=query
+        ) | clients.filter(
+            email__icontains=query
+        ) | clients.filter(
+            cin__icontains=query
+        )
+    return render(request, 'clients/liste.html', {'clients': clients, 'query': query})
+
+@login_required
+@admin_only
 def ajouter_client(request):
     if request.method == 'POST':
         Client.objects.create(
@@ -23,8 +36,8 @@ def ajouter_client(request):
         return redirect('liste_clients')
     return render(request, 'clients/ajouter.html')
 
-# Modifier un client
 @login_required
+@admin_only
 def modifier_client(request, pk):
     client = get_object_or_404(Client, pk=pk)
     if request.method == 'POST':
@@ -38,15 +51,15 @@ def modifier_client(request, pk):
         return redirect('liste_clients')
     return render(request, 'clients/modifier.html', {'client': client})
 
-# Supprimer un client
 @login_required
+@admin_only
 def supprimer_client(request, pk):
     client = get_object_or_404(Client, pk=pk)
     client.delete()
     return redirect('liste_clients')
 
-# Détail d'un client
 @login_required
+@admin_only
 def detail_client(request, pk):
     client = get_object_or_404(Client, pk=pk)
     return render(request, 'clients/detail.html', {'client': client})

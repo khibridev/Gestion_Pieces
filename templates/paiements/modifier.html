@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}Modifier un Paiement{% endblock %}
-{% block page_title %}💰 Modifier un Paiement{% endblock %}
+{% block page_title %} <i class="fas fa-money-bill-wave"></i>Modifier un Paiement{% endblock %}
 
 {% block content %}
 <div class="card shadow-sm" style="max-width:600px; margin:auto;">
     <div class="card-header bg-warning">
-        <h5 class="mb-0">✏️ Modifier le Paiement</h5>
+        <h5 class="mb-0"><i class="fas fa-edit"></i> Modifier le Paiement</h5>
     </div>
     <div class="card-body">
         <form method="POST">
@@ -44,9 +44,9 @@
                     <option value="impaye" {% if paiement.statut == 'impaye' %}selected{% endif %}>Impayé</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-warning w-100">💾 Enregistrer</button>
+            <button type="submit" class="btn btn-warning w-100"><i class="fas fa-save"></i> Enregistrer</button>
         </form>
     </div>
 </div>
-<a href="{% url 'liste_paiements' %}" class="btn btn-secondary mt-3">⬅️ Retour</a>
+<a href="{% url 'liste_paiements' %}" class="btn btn-secondary mt-3"> <i class="fas fa-arrow-left"></i> Retour</a>
 {% endblock %}

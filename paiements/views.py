@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Paiement
+import openpyxl
+from django.http import HttpResponse
 
 admin_only = user_passes_test(lambda u: u.is_staff, login_url='/login/')
 
@@ -63,8 +65,7 @@ def supprimer_paiement(request, pk):
 def detail_paiement(request, pk):
     paiement = get_object_or_404(Paiement, pk=pk)
     return render(request, 'paiements/detail.html', {'paiement': paiement})
-import openpyxl
-from django.http import HttpResponse
+
 
 @login_required
 @admin_only

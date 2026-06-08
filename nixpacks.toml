@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python311"]
+nixPkgs = ["python3"]
 
 [start]
 cmd = "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn gestion_pieces.wsgi:application"

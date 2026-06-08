@@ -18,6 +18,7 @@ class Piece(models.Model):
     fournisseur = models.CharField(max_length=200, verbose_name="Fournisseur")
     stock_minimum = models.PositiveIntegerField(default=0, verbose_name="Stock minimum")
     stock_maximum = models.PositiveIntegerField(default=100, verbose_name="Stock maximum")
+    criticite = models.BooleanField(default=False, verbose_name="Pièce critique")
     type_piece = models.CharField(
         max_length=20,
         choices=TypePiece.choices,

@@ -317,3 +317,43 @@ def mon_profil(request):
         messages.success(request, 'Profil mis à jour.')
         return redirect('mon_profil')
     return render(request, 'pieces/utilisateurs/profil.html', {'page': 'profil'})
+def export_critiques_excel(request):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Pièces Critiques"
+
+    header_fill = PatternFill("solid", fgColor="FF4757")
+    header_font = Font(bold=True, color="FFFFFF")
+
+    headers = ['Description', 'Référence', 'Emplacement', 'Stock réel', 'Stock minimum', 'Fournisseur', 'Type', 'Statut']
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center')
+
+    pieces = Piece.objects.all()
+    critiques = [p for p in pieces if p.est_critique]
+    basses = [p for p in pieces if p.statut_stock == 'bas']
+
+    for piece in critiques:
+        ws.append([
+            piece.description, piece.reference, piece.emplacement,
+            piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+            piece.get_type_piece_display(), 'Critique'
+        ])
+    for piece in basses:
+        ws.append([
+            piece.description, piece.reference, piece.emplacement,
+            piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+            piece.get_type_piece_display(), 'Stock bas'
+        ])
+
+    for col in ws.columns:
+        max_len = max(len(str(cell.value or '')) for cell in col)
+        ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="pieces_critiques.xlsx"'
+    wb.save(response)
+    return response

@@ -49,7 +49,7 @@
             <thead><tr>
                 <th class="ps-3">Photo</th><th>Référence</th><th>Description</th><th>Emplacement</th>
                 <th>Stock réel</th><th>Fournisseur</th><th>Min / Max</th>
-                <th>Type</th><th>Statut</th><th class="pe-3">Actions</th>
+                <th>Type</th><th>Statut de Stock</th><th>Criticité</th><th class="pe-3">Actions</th>
             </tr></thead>
             <tbody>
             {% for piece in pieces %}
@@ -84,10 +84,17 @@
     </td>
     <td>
         <span class="stock-{{ piece.statut_stock }}" style="padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:600;">
-            {% if piece.statut_stock == 'critique' %}🔴 Critique
+            {% if piece.statut_stock == 'critique' %}🔴 À commander
             {% elif piece.statut_stock == 'bas' %}🟡 Bas
             {% else %}🟢 Normal{% endif %}
         </span>
+    </td>
+    <td>
+        {% if piece.criticite %}
+        <span class="badge bg-danger">⚠️ Oui</span>
+        {% else %}
+        <span class="badge bg-success">✅ Non</span>
+        {% endif %}
     </td>
     <td class="pe-3">
         <a href="/pieces/{{ piece.pk }}/modifier/" class="btn btn-outline-primary btn-action me-1">

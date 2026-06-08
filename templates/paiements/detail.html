@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Détail Paiement{% endblock %}
+{% block page_title %}<i class="fas fa-money-bill-wave"></i> Détail Paiement{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm" style="max-width:600px; margin:auto;">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-money-bill-wave"></i> Détail du Paiement</h5>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <tr><th>Contrat</th><td>{{ paiement.contrat.numero }}</td></tr>
+            <tr><th>Client</th><td>{{ paiement.contrat.client }}</td></tr>
+            <tr><th>Montant</th><td>{{ paiement.montant }} DH</td></tr>
+            <tr><th>Date</th><td>{{ paiement.date_paiement|date:"d/m/Y" }}</td></tr>
+            <tr><th>Mode</th><td>{{ paiement.mode }}</td></tr>
+            <tr><th>Statut</th><td>{{ paiement.statut }}</td></tr>
+        </table>
+        <a href="{% url 'modifier_paiement' paiement.pk %}" class="btn btn-warning"> <i class="fas fa-edit"></i>Modifier</a>
+        <a href="{% url 'liste_paiements' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour</a>
+    </div>
+</div>
+{% endblock %}

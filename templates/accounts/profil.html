@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Mon Profil{% endblock %}
+{% block page_title %}👤 Mon Profil{% endblock %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+<div class="card shadow-sm" style="max-width:600px; margin:auto;">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">👤 Mon Profil</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Nom d'utilisateur</label>
+                <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Prénom</label>
+                <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Nom</label>
+                <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="{{ request.user.email }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Rôle</label>
+                <input type="text" class="form-control" 
+                       value="{% if request.user.is_staff %}Administrateur{% else %}Client{% endif %}" disabled>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">💾 Enregistrer</button>
+        </form>
+        <a href="{% url 'changer_password' %}" class="btn btn-warning w-100 mt-2">
+         🔑 Changer le mot de passe
+        </a>
+    </div>
+</div>
+{% endblock %}

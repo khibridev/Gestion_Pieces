@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Domicohouse{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3c5e;
+            --orange: #e8821a;
+            --sidebar-width: 260px;
+            --bg: #f7f8fc;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --sidebar-bg: #1a3c5e;
+            --sidebar-text: rgba(255,255,255,0.75);
+            --sidebar-active: rgba(255,255,255,0.12);
+            --topbar-bg: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f1923;
+            --card-bg: #1a2535;
+            --text: #e2e8f0;
+            --text-light: #a0aec0;
+            --border: #2d3748;
+            --topbar-bg: #1a2535;
+            --sidebar-bg: #0f1923;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            background: var(--sidebar-bg);
+            z-index: 100;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo h4 {
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .sidebar-logo span {
+            color: var(--orange);
+        }
+
+        .sidebar-logo small {
+            color: rgba(255,255,255,0.45);
+            font-size: 11px;
+            display: block;
+            margin-top: 3px;
+        }
+
+        .sidebar-menu {
+            padding: 12px 0;
+            flex: 1;
+        }
+
+        .menu-title {
+            padding: 16px 20px 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 11px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            gap: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            margin: 2px 0;
+        }
+
+        .sidebar-menu a:hover {
+            background: var(--sidebar-active);
+            color: white;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--sidebar-active);
+            color: white;
+            border-left-color: var(--orange);
+        }
+
+        .sidebar-menu a i {
+            width: 18px;
+            font-size: 15px;
+            opacity: 0.8;
+        }
+
+        /* TOPBAR */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--topbar-bg);
+            padding: 0 28px;
+            height: 64px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* CONTENT */
+        .content-area {
+            padding: 28px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* STAT CARDS */
+        .stat-card {
+            border-radius: 12px;
+            padding: 22px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            top: -15px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .stat-card h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 8px 0 0;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+
+        .stat-card i {
+            font-size: 1.6rem;
+            opacity: 0.6;
+        }
+
+        /* TABLES */
+        .table {
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .table thead th {
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border);
+            background: var(--bg);
+            padding: 12px 16px;
+        }
+
+        .table tbody td {
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-hover tbody tr:hover {
+            background: var(--bg);
+        }
+
+        /* BUTTONS */
+        .btn {
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 8px;
+            padding: 8px 16px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #142d47;
+            border-color: #142d47;
+        }
+
+        .btn-orange {
+            background: var(--orange);
+            border-color: var(--orange);
+            color: white;
+        }
+
+        .btn-orange:hover {
+            background: #c9711a;
+            border-color: #c9711a;
+            color: white;
+        }
+
+        /* FORMS */
+        .form-control, .form-select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 10px 14px;
+            background: var(--card-bg);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,60,94,0.1);
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+
+        /* BADGES */
+        .badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* SEARCH */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding-left: 38px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .page-header h4 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .page-header-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+{% if request.user.is_authenticated %}
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h4>Domico<span>house</span></h4>
+        <small>Plateforme de gestion</small>
+    </div>
+    <div class="sidebar-menu">
+        {% if request.user.is_staff %}
+        <div class="menu-title">Principal</div>
+        <a href="{% url 'dashboard_admin' %}" class="{% if request.resolver_match.url_name == 'dashboard_admin' %}active{% endif %}">
+            <i class="fas fa-chart-pie"></i> Dashboard
+        </a>
+        <div class="menu-title">Gestion</div>
+        <a href="{% url 'liste_clients' %}" class="{% if 'client' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-users"></i> Clients
+        </a>
+        <a href="{% url 'liste_contrats' %}" class="{% if 'contrat' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-file-contract"></i> Contrats
+        </a>
+        <a href="{% url 'liste_paiements' %}" class="{% if 'paiement' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="fas fa-money-bill-wave"></i> Paiements
+        </a>
+        {% else %}
+        <div class="menu-title">Mon Espace</div>
+        <a href="{% url 'dashboard_client' %}">
+            <i class="fas fa-home"></i> Accueil
+        </a>
+        {% endif %}
+        <div class="menu-title">Compte</div>
+        <a href="{% url 'profil' %}">
+            <i class="fas fa-user-circle"></i> Mon Profil
+        </a>
+        <a href="{% url 'changer_password' %}">
+            <i class="fas fa-key"></i> Mot de passe
+        </a>
+        <a href="{% url 'logout' %}">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="topbar">
+        <span class="topbar-title">{% block page_title %}{% endblock %}</span>
+        <div class="topbar-right">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Mode sombre">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+            <div class="user-badge">
+                <div class="user-avatar">{{ request.user.username|first|upper }}</div>
+                <span>{{ request.user.username }}</span>
+                {% if request.user.is_staff %}
+                    <span class="badge" style="background:#e8821a;">Admin</span>
+                {% else %}
+                    <span class="badge" style="background:#1a3c5e;">Client</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="content-area">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+{% else %}
+{% block content_auth %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Mode sombre
+    function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById('themeIcon');
+        if (body.getAttribute('data-theme') === 'dark') {
+            body.removeAttribute('data-theme');
+            icon.className = 'fas fa-moon';
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.setAttribute('data-theme', 'dark');
+            icon.className = 'fas fa-sun';
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    // Charger le thème sauvegardé
+    window.onload = function() {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.getElementById('themeIcon').className = 'fas fa-sun';
+        }
+    }
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

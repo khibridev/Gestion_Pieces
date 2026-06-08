@@ -126,4 +126,4 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-CSRF_TRUSTED_ORIGINS = ['https://Gestion_Pieces.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://gestionpiecess.up.railway.app']

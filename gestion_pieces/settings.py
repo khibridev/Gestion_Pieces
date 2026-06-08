@@ -74,3 +74,4 @@ ALLOWED_HOSTS = ['*']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CSRF_TRUSTED_ORIGINS = ['https://gestionpiecess.up.railway.app']
+STATICFILES_DIRS = [BASE_DIR / 'static']

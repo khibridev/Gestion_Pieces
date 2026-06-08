@@ -37,8 +37,10 @@
 </head>
 <body>
 <div class="login-card">
-    <div class="login-logo">⚙️</div>
-    <div class="login-title">Gestion des Pièces</div>
+    {% load static %}
+    <div class="text-center mb-4">
+        <img src="{% static 'images/logo.png' %}" style="width:180px;">
+    </div>
     <div class="login-subtitle">Connectez-vous pour accéder à l'application</div>
 
     {% if form.errors %}

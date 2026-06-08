@@ -1,0 +1,111 @@
+{% extends 'pieces/base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-database me-2"></i>Base de données pièces</h1>
+        <p class="text-muted mb-0">{{ pieces.count }} pièce(s) enregistrée(s)</p>
+    </div>
+    <a href="/pieces/ajouter/" class="btn btn-warning fw-bold">
+        <i class="bi bi-plus-lg me-1"></i>Nouvelle pièce
+    </a>
+    <div class="d-flex gap-2">
+    <a href="/pieces/export/" class="btn btn-success fw-bold">
+        <i class="bi bi-file-earmark-excel me-1"></i>Exporter Excel
+    </a>
+    <a href="/pieces/ajouter/" class="btn btn-warning fw-bold">
+        <i class="bi bi-plus-lg me-1"></i>Nouvelle pièce
+    </a>
+</div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <input type="text" name="q" value="{{ query }}" class="form-control"
+                       placeholder="Rechercher par description, référence, fournisseur...">
+            </div>
+            <div class="col-md-3">
+                <select name="type" class="form-select">
+                    <option value="">-- Tous les types --</option>
+                    <option value="mecanique" {% if type_filtre == 'mecanique' %}selected{% endif %}>Mécanique</option>
+                    <option value="pneumatique" {% if type_filtre == 'pneumatique' %}selected{% endif %}>Pneumatique</option>
+                    <option value="electrique" {% if type_filtre == 'electrique' %}selected{% endif %}>Électrique</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Filtrer</button>
+            </div>
+            <div class="col-md-2">
+                <a href="/pieces/" class="btn btn-outline-secondary w-100">Réinitialiser</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr>
+                <th class="ps-3">Photo</th><th>Référence</th><th>Description</th><th>Emplacement</th>
+                <th>Stock réel</th><th>Fournisseur</th><th>Min / Max</th>
+                <th>Type</th><th>Statut</th><th class="pe-3">Actions</th>
+            </tr></thead>
+            <tbody>
+            {% for piece in pieces %}
+<tr>
+    <td class="ps-3">
+        {% if piece.photo %}
+        <img src="{{ piece.photo.url }}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
+        {% else %}
+        <div style="width:50px; height:50px; background:#f0f0f0; border-radius:8px; display:flex; align-items:center; justify-content:center;">
+            <i class="bi bi-image text-muted"></i>
+        </div>
+        {% endif %}
+    </td>
+    <td><strong>{{ piece.reference }}</strong></td>
+    <td>{{ piece.description }}</td>
+    <td><span class="badge bg-secondary">{{ piece.emplacement }}</span></td>
+    <td>
+        <strong class="{% if piece.est_critique %}text-danger{% endif %}">
+            {{ piece.stock_reel }}
+        </strong>
+    </td>
+    <td class="text-muted small">{{ piece.fournisseur }}</td>
+    <td class="small text-muted">{{ piece.stock_minimum }} / {{ piece.stock_maximum }}</td>
+    <td>
+        {% if piece.type_piece == 'mecanique' %}
+        <span class="badge-type" style="background:#e8f0fe;color:#1a73e8">⚙️ Mécan.</span>
+        {% elif piece.type_piece == 'pneumatique' %}
+        <span class="badge-type" style="background:#e6f4ea;color:#188038">💨 Pneum.</span>
+        {% else %}
+        <span class="badge-type" style="background:#fce8e6;color:#c5221f">⚡ Élec.</span>
+        {% endif %}
+    </td>
+    <td>
+        <span class="stock-{{ piece.statut_stock }}" style="padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:600;">
+            {% if piece.statut_stock == 'critique' %}🔴 Critique
+            {% elif piece.statut_stock == 'bas' %}🟡 Bas
+            {% else %}🟢 Normal{% endif %}
+        </span>
+    </td>
+    <td class="pe-3">
+        <a href="/pieces/{{ piece.pk }}/modifier/" class="btn btn-outline-primary btn-action me-1">
+            <i class="bi bi-pencil"></i>
+        </a>
+        <a href="/pieces/{{ piece.pk }}/supprimer/" class="btn btn-outline-danger btn-action">
+            <i class="bi bi-trash"></i>
+        </a>
+    </td>
+</tr>
+{% empty %}
+<tr><td colspan="10" class="text-center text-muted py-5">
+    <i class="bi bi-inbox display-4 d-block mb-2"></i>
+    Aucune pièce trouvée. <a href="/pieces/ajouter/">Ajouter la première pièce</a>
+</td></tr>
+{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'pieces/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-person-plus me-2"></i>{{ titre }}</h1>
+</div>
+<div class="row">
+<div class="col-md-7">
+<div class="form-section">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Nom d'utilisateur *</label>
+                <input type="text" name="username" class="form-control" value="{{ u.username|default:'' }}" {% if u %}disabled{% endif %}>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Mot de passe {% if u %}(laisser vide = inchangé){% else %}*{% endif %}</label>
+                <input type="password" name="password" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Prénom</label>
+                <input type="text" name="first_name" class="form-control" value="{{ u.first_name|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Nom</label>
+                <input type="text" name="last_name" class="form-control" value="{{ u.last_name|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Email</label>
+                <input type="email" name="email" class="form-control" value="{{ u.email|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Téléphone</label>
+                <input type="text" name="telephone" class="form-control" value="{{ u.profile.telephone|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Poste / Fonction</label>
+                <input type="text" name="poste" class="form-control" value="{{ u.profile.poste|default:'' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Rôle *</label>
+                <select name="role" class="form-select">
+                    <option value="admin" {% if u.profile.role == 'admin' %}selected{% endif %}>⭐ Administrateur</option>
+                    <option value="technicien" {% if u.profile.role == 'technicien' %}selected{% endif %}>🔧 Technicien</option>
+                    <option value="lecteur" {% if u.profile.role == 'lecteur' %}selected{% endif %}>👁️ Lecteur</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Photo de profil</label>
+                <input type="file" name="photo" class="form-control" accept="image/*">
+                {% if u.profile.photo %}
+                <img src="{{ u.profile.photo.url }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;margin-top:8px;">
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-warning fw-bold px-4">
+                <i class="bi bi-check-lg me-1"></i>Enregistrer
+            </button>
+            <a href="/utilisateurs/" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}

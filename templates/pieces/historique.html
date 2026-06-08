@@ -1,0 +1,66 @@
+{% extends 'pieces/base.html' %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1><i class="bi bi-clock-history me-2"></i>Historique des mouvements</h1>
+        <p class="text-muted mb-0">{{ mouvements.count }} mouvement(s) enregistré(s)</p>
+    </div>
+    <a href="/historique/export/" class="btn btn-success fw-bold">
+        <i class="bi bi-file-earmark-excel me-1"></i>Exporter Excel
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <select name="type" class="form-select">
+                    <option value="">-- Tous les mouvements --</option>
+                    <option value="consommation" {% if type_filtre == 'consommation' %}selected{% endif %}>Consommations</option>
+                    <option value="reception" {% if type_filtre == 'reception' %}selected{% endif %}>Réceptions</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            </div>
+            <div class="col-md-2">
+                <a href="/historique/" class="btn btn-outline-secondary w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead><tr>
+                <th class="ps-3">Date</th><th>Pièce</th><th>Référence</th>
+                <th>Type</th><th>Quantité</th><th>Stock avant</th>
+                <th>Stock après</th><th class="pe-3">Commentaire</th>
+            </tr></thead>
+            <tbody>
+            {% for m in mouvements %}
+            <tr>
+                <td class="ps-3 text-muted small">{{ m.date|date:"d/m/Y H:i" }}</td>
+                <td>{{ m.piece.description|truncatechars:30 }}</td>
+                <td><strong>{{ m.piece.reference }}</strong></td>
+                <td>
+                    {% if m.type_mouvement == 'consommation' %}
+                    <span class="badge bg-warning text-dark"><i class="bi bi-arrow-down"></i> Consommation</span>
+                    {% else %}
+                    <span class="badge bg-success"><i class="bi bi-arrow-up"></i> Réception</span>
+                    {% endif %}
+                </td>
+                <td><strong>{{ m.quantite }}</strong></td>
+                <td>{{ m.stock_avant }}</td>
+                <td><strong>{{ m.stock_apres }}</strong></td>
+                <td class="pe-3 text-muted small">{{ m.commentaire|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" class="text-center text-muted py-4">Aucun mouvement trouvé</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

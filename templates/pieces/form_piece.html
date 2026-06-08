@@ -1,0 +1,73 @@
+{% extends 'pieces/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-pencil-square me-2"></i>{{ titre }}</h1>
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="form-section">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold">Description *</label>
+                        {{ form.description }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Référence *</label>
+                        {{ form.reference }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Emplacement *</label>
+                        {{ form.emplacement }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Fournisseur</label>
+                        {{ form.fournisseur }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Type de pièce</label>
+                        {{ form.type_piece }}
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold">Photo de la pièce</label>
+                        {{ form.photo }}
+                        {% if piece.photo %}
+                        <div class="mt-2">
+                            <img src="{{ piece.photo.url }}" style="max-height:150px; border-radius:8px;">
+                            <div class="text-muted small mt-1">Photo actuelle</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Stock réel</label>
+                        {{ form.stock_reel }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Stock minimum</label>
+                        {{ form.stock_minimum }}
+                        <div class="form-text">Seuil déclenchant une alerte</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Stock maximum</label>
+                        {{ form.stock_maximum }}
+                    </div>
+                </div>
+                {% if form.errors %}
+                <div class="alert alert-danger mt-3">
+                    {% for field in form %}{% for error in field.errors %}
+                    <div>{{ field.label }} : {{ error }}</div>
+                    {% endfor %}{% endfor %}
+                </div>
+                {% endif %}
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-warning fw-bold px-4">
+                        <i class="bi bi-check-lg me-1"></i>Enregistrer
+                    </button>
+                    <a href="/pieces/" class="btn btn-outline-secondary">Annuler</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

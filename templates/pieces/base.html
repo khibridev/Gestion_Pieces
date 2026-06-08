@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Pièces</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #f5c518;
+            --sidebar-width: 260px;
+        }
+        * { box-sizing: border-box; }
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin: 0; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width); min-height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f3460 100%);
+            position: fixed; top: 0; left: 0; z-index: 100;
+            display: flex; flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+        }
+        .sidebar-brand {
+            color: var(--accent); font-weight: 700; font-size: 1rem;
+            padding: 25px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-brand .brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #f5c518, #e6a800);
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .sidebar-nav { flex: 1; padding: 15px 10px; }
+        .nav-section-title {
+            color: rgba(255,255,255,0.3); font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            padding: 10px 12px 5px; font-weight: 600;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.65); padding: 11px 14px;
+            border-radius: 10px; margin: 2px 0;
+            display: flex; align-items: center; gap: 10px;
+            transition: all 0.2s; font-size: 0.9rem;
+        }
+        .sidebar .nav-link:hover {
+            background: rgba(255,255,255,0.1); color: white;
+        }
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, #f5c518, #e6a800);
+            color: #1a1a2e; font-weight: 700;
+            box-shadow: 0 4px 12px rgba(245,197,24,0.35);
+        }
+        .sidebar .nav-link i { font-size: 1rem; width: 20px; text-align: center; }
+        .sidebar-footer {
+            padding: 15px 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .user-info {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; margin-bottom: 5px;
+            background: rgba(255,255,255,0.05); border-radius: 10px;
+        }
+        .user-avatar {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: linear-gradient(135deg, #f5c518, #e6a800);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85rem; color: #1a1a2e; flex-shrink: 0;
+        }
+        .user-name { color: white; font-size: 0.85rem; font-weight: 600; }
+        .user-role { color: rgba(255,255,255,0.4); font-size: 0.72rem; }
+
+        /* MAIN */
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; min-height: 100vh; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-header p { color: #888; margin: 4px 0 0; font-size: 0.9rem; }
+
+        /* CARDS */
+        .card { border: none; border-radius: 14px; box-shadow: 0 2px 15px rgba(0,0,0,0.07); }
+        .card-header { border-radius: 14px 14px 0 0 !important; font-weight: 600; border-bottom: 1px solid #f0f0f0; }
+
+        /* STAT CARDS */
+        .stat-card {
+            border-radius: 14px; padding: 22px;
+            color: white; position: relative; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .stat-card::after {
+            content: ''; position: absolute; right: -20px; top: -20px;
+            width: 100px; height: 100px; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+        }
+        .stat-card .stat-number { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+        .stat-card .stat-label { font-size: 0.82rem; opacity: 0.85; margin-top: 5px; }
+
+        /* TABLE */
+        .table th {
+            font-weight: 600; font-size: 0.78rem; text-transform: uppercase;
+            letter-spacing: 0.6px; color: #999; background: #fafafa;
+            border-bottom: 2px solid #f0f0f0; padding: 12px 10px;
+        }
+        .table td { vertical-align: middle; padding: 10px; border-bottom: 1px solid #f8f8f8; }
+        .table tbody tr:hover { background: #fafbff; }
+
+        /* BADGES & STATUS */
+        .stock-critique { background: #ffe8e8; color: #c0392b; }
+        .stock-bas { background: #fff8e1; color: #856404; }
+        .stock-normal { background: #e8f8ee; color: #1a7340; }
+        .badge-type { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+
+        /* BUTTONS */
+        .btn-action { padding: 5px 10px; font-size: 0.8rem; border-radius: 8px; }
+        .btn-warning { background: linear-gradient(135deg, #f5c518, #e6a800); border: none; color: #1a1a2e; font-weight: 600; }
+        .btn-warning:hover { background: linear-gradient(135deg, #e6a800, #cc9500); color: #1a1a2e; }
+
+        /* ALERTS */
+        .alert { border-radius: 12px; border: none; }
+
+        /* FORMS */
+        .form-section { background: white; border-radius: 14px; padding: 28px; box-shadow: 0 2px 15px rgba(0,0,0,0.07); }
+        .form-control, .form-select {
+            border-radius: 10px; border: 2px solid #eef0f3; padding: 10px 14px;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #f5c518; box-shadow: 0 0 0 3px rgba(245,197,24,0.15);
+        }
+        .piece-info-box {
+            background: #f8f9fa; border-radius: 10px; padding: 15px;
+            border-left: 4px solid var(--accent);
+        }
+
+        /* DARK MODE */
+        body.dark-mode { background: #0d0d1a; }
+        body.dark-mode .main-content { color: #e0e0e0; }
+        body.dark-mode .card { background: #1a1a2e; color: #e0e0e0; box-shadow: 0 2px 15px rgba(0,0,0,0.3); }
+        body.dark-mode .card-header { background: #16213e !important; color: #e0e0e0; border-bottom: 1px solid #2a2a4a; }
+        body.dark-mode .table th { background: #16213e; color: #aaa; border-bottom: 2px solid #2a2a4a; }
+        body.dark-mode .table td { border-bottom: 1px solid #2a2a4a; color: #ddd; }
+        body.dark-mode .table tbody tr:hover { background: #1e1e3a; }
+        body.dark-mode .form-section { background: #1a1a2e; color: #e0e0e0; }
+        body.dark-mode .form-control, body.dark-mode .form-select { background: #16213e; border-color: #2a2a4a; color: #e0e0e0; }
+        body.dark-mode .form-control:focus, body.dark-mode .form-select:focus { background: #16213e; color: #e0e0e0; }
+        body.dark-mode .page-header h1 { color: #e0e0e0; }
+        body.dark-mode .text-muted { color: #888 !important; }
+        body.dark-mode .piece-info-box { background: #16213e; }
+        body.dark-mode .btn-outline-primary { color: #7eb3ff; border-color: #7eb3ff; }
+        body.dark-mode .btn-outline-danger { color: #ff6b6b; border-color: #ff6b6b; }
+        body.dark-mode .btn-outline-secondary { color: #aaa; border-color: #aaa; }
+
+        /* LOGOUT FORM */
+        .logout-form { margin: 0; padding: 0; }
+        .logout-form button {
+            color: #ff6b6b !important;
+            padding: 11px 14px;
+            border-radius: 10px; margin: 2px 0;
+            display: flex; align-items: center; gap: 10px;
+            transition: all 0.2s; font-size: 0.9rem;
+            width: 100%; text-align: left;
+            border: none; background: transparent;
+            cursor: pointer;
+        }
+        .logout-form button:hover {
+            background: rgba(255,100,100,0.1);
+        }
+        .logout-form button i { font-size: 1rem; width: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <div class="brand-icon">⚙️</div>
+        <div>Gestion<br><span style="font-size:0.75rem;opacity:0.7;font-weight:400;">des Pièces</span></div>
+    </div>
+
+    <div class="sidebar-nav">
+        <div class="nav-section-title">Navigation</div>
+        <a href="/" class="nav-link {% if page == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2"></i> Tableau de bord
+        </a>
+        <a href="/pieces/" class="nav-link {% if page == 'pieces' %}active{% endif %}">
+            <i class="bi bi-database"></i> Base de données
+        </a>
+
+        <div class="nav-section-title mt-2">Opérations</div>
+        <a href="/consommation/" class="nav-link {% if page == 'consommation' %}active{% endif %}">
+            <i class="bi bi-arrow-down-circle"></i> Consommation
+        </a>
+        <a href="/reception/" class="nav-link {% if page == 'reception' %}active{% endif %}">
+            <i class="bi bi-arrow-up-circle"></i> Réception
+        </a>
+
+        <div class="nav-section-title mt-2">Alertes</div>
+        <a href="/critiques/" class="nav-link {% if page == 'critiques' %}active{% endif %}">
+            <i class="bi bi-exclamation-triangle"></i> Pièces critiques
+            {% if nb_critiques > 0 %}
+            <span class="ms-auto badge rounded-pill" style="background:#ff4757;font-size:0.7rem;">{{ nb_critiques }}</span>
+            {% endif %}
+        </a>
+        <a href="/historique/" class="nav-link {% if page == 'historique' %}active{% endif %}">
+            <i class="bi bi-clock-history"></i> Historique
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <button onclick="toggleDark()" class="nav-link w-100 text-start border-0 bg-transparent mb-1" id="darkBtn">
+            <i class="bi bi-moon"></i> <span id="darkLabel">Mode sombre</span>
+        </button>
+        {% if request.user.profile.role == 'admin' %}
+        <a href="/utilisateurs/" class="nav-link {% if page == 'utilisateurs' %}active{% endif %}">
+            <i class="bi bi-people"></i> Utilisateurs
+        </a>
+        {% endif %}
+        <div class="user-info mt-2">
+            <div class="user-avatar">{{ request.user.username|first|upper }}</div>
+            <div>
+                <div class="user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="user-role">{{ request.user.profile.get_role_display }}</div>
+            </div>
+        </div>
+        <form method="post" action="/logout/" class="logout-form">
+            {% csrf_token %}
+            <button type="submit">
+                <i class="bi bi-box-arrow-right"></i> Déconnexion
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="main-content">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleDark() {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('darkMode', isDark);
+    document.getElementById('darkLabel').textContent = isDark ? 'Mode clair' : 'Mode sombre';
+    document.getElementById('darkBtn').querySelector('i').className = isDark ? 'bi bi-sun' : 'bi bi-moon';
+}
+if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('darkLabel').textContent = 'Mode clair';
+        document.getElementById('darkBtn').querySelector('i').className = 'bi bi-sun';
+    });
+}
+</script>
+</body>
+</html>

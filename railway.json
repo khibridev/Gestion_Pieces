@@ -1,10 +1,9 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "pip3 install -r requirements.txt && python3 manage.py collectstatic --noinput"
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python3 manage.py migrate && gunicorn gestion_pieces.wsgi:application",
+    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn gestion_pieces.wsgi:application",
     "restartPolicyType": "ON_FAILURE"
   }
 }

@@ -77,14 +77,14 @@
     <div class="col-md-4">
         <div class="card border-danger">
             <div class="card-header bg-danger text-white py-3">
-                <i class="bi bi-exclamation-triangle me-2"></i>Alertes stock critique
+                <i class="bi bi-exclamation-triangle me-2"></i>Alertes de Stock
             </div>
             <div class="card-body p-0">
                 {% for m in derniers_mouvements %}{% endfor %}
                 {% comment %}Show critical pieces{% endcomment %}
                 <div class="p-3 text-center">
                     <a href="/critiques/" class="btn btn-danger w-100">
-                        <i class="bi bi-eye me-2"></i>Voir les {{ pieces_critiques }} pièces critiques
+                        <i class="bi bi-eye me-2"></i>Voir les {{ pieces_critiques }} pièces
                     </a>
                 </div>
             </div>

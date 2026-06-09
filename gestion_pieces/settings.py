@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -86,5 +87,12 @@ CLOUDINARY_STORAGE = {
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY', '684142961335137'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', 'mTPa8t2rh_4xRzgzKryjttwYS1U'),
 }
+
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'dkuh6i5sx'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY', '684142961335137'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET', 'mTPa8t2rh_4xRzgzKryjttwYS1U'),
+    secure=True
+)
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

@@ -35,6 +35,10 @@
                     {{ form.quantite }}
                 </div>
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Matricule technicien</label>
+                    {{ form.matricule }}
+                </div>
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Commentaire</label>
                     {{ form.commentaire }}
                 </div>
@@ -57,8 +61,13 @@
             <div class="card-body p-0">
                 <table class="table table-hover mb-0 small">
                     <thead><tr>
-                        <th class="ps-3">Date</th><th>Pièce</th><th>Qté</th>
-                        <th>Avant</th><th>Après</th><th class="pe-3">Commentaire</th>
+                        <th class="ps-3">Date</th>
+                        <th>Pièce</th>
+                        <th>Qté</th>
+                        <th>Avant</th>
+                        <th>Après</th>
+                        <th>Matricule</th>
+                        <th class="pe-3">Commentaire</th>
                     </tr></thead>
                     <tbody>
                     {% for m in historique %}
@@ -69,10 +78,11 @@
                         <td><span class="badge bg-warning text-dark">-{{ m.quantite }}</span></td>
                         <td>{{ m.stock_avant }}</td>
                         <td><strong class="{% if m.stock_apres <= m.piece.stock_minimum %}text-danger{% endif %}">{{ m.stock_apres }}</strong></td>
+                        <td>{{ m.matricule|default:"-" }}</td>
                         <td class="pe-3 text-muted">{{ m.commentaire|truncatechars:20 }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="6" class="text-center text-muted py-4">Aucune consommation enregistrée</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Aucune consommation enregistrée</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

@@ -61,6 +61,7 @@ class MouvementStock(models.Model):
     stock_apres = models.PositiveIntegerField()
     date = models.DateTimeField(default=timezone.now)
     commentaire = models.TextField(blank=True)
+    matricule = models.CharField(max_length=50, blank=True, verbose_name="Matricule technicien")
 
     class Meta:
         ordering = ['-date']

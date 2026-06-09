@@ -12,7 +12,7 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Pièce *</label>
-                    <input type="text" id="searchPiece" class="form-control mb-2" placeholder="Rechercher par emplacement ou référence...">
+                    <input type="text" id="searchPiece" class="form-control mb-2" placeholder="Rechercher par référence ou description...">
                     <select name="piece" id="id_piece" class="form-select" size="5" style="height:auto;">
                         <option value="">-- Sélectionner une pièce --</option>
                         {% for piece in form.piece.field.queryset %}
@@ -33,6 +33,10 @@
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Quantité reçue *</label>
                     {{ form.quantite }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Matricule technicien</label>
+                    {{ form.matricule }}
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Commentaire / N° BL</label>
@@ -57,8 +61,13 @@
             <div class="card-body p-0">
                 <table class="table table-hover mb-0 small">
                     <thead><tr>
-                        <th class="ps-3">Date</th><th>Pièce</th><th>Qté</th>
-                        <th>Avant</th><th>Après</th><th class="pe-3">Commentaire</th>
+                        <th class="ps-3">Date</th>
+                        <th>Pièce</th>
+                        <th>Qté</th>
+                        <th>Avant</th>
+                        <th>Après</th>
+                        <th>Matricule</th>
+                        <th class="pe-3">Commentaire</th>
                     </tr></thead>
                     <tbody>
                     {% for m in historique %}
@@ -69,10 +78,11 @@
                         <td><span class="badge bg-success">+{{ m.quantite }}</span></td>
                         <td>{{ m.stock_avant }}</td>
                         <td><strong class="text-success">{{ m.stock_apres }}</strong></td>
+                        <td>{{ m.matricule|default:"-" }}</td>
                         <td class="pe-3 text-muted">{{ m.commentaire|truncatechars:20 }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="6" class="text-center text-muted py-4">Aucune réception enregistrée</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">Aucune réception enregistrée</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

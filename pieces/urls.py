@@ -19,6 +19,6 @@ urlpatterns = [
     path('utilisateurs/<int:pk>/modifier/', login_required(views.modifier_utilisateur), name='modifier_utilisateur'),
     path('utilisateurs/<int:pk>/supprimer/', login_required(views.supprimer_utilisateur), name='supprimer_utilisateur'),
     path('profil/', login_required(views.mon_profil), name='mon_profil'),
-    path('critiques/export/', views.export_critiques_excel, name='export_critiques_excel'),
+    path('critiques/export/', login_required(views.export_alertes_excel), name='export_alertes'),
 
 ]

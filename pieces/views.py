@@ -105,6 +105,7 @@ def consommation(request):
                     stock_avant=stock_avant,
                     stock_apres=piece.stock_reel,
                     commentaire=commentaire,
+                    matricule=form.cleaned_data.get('matricule', ''),
                 )
                 messages.success(request, f'Consommation enregistrée. Nouveau stock : {piece.stock_reel}')
                 return redirect('consommation')
@@ -131,6 +132,7 @@ def reception(request):
                 stock_avant=stock_avant,
                 stock_apres=piece.stock_reel,
                 commentaire=commentaire,
+                matricule=form.cleaned_data.get('matricule', ''),
             )
             messages.success(request, f'Réception enregistrée. Nouveau stock : {piece.stock_reel}')
             return redirect('reception')
@@ -151,6 +153,8 @@ def pieces_critiques(request):
         'a_surveiller': a_surveiller,
         'page': 'critiques',
     })
+
+
 def historique(request):
     type_filtre = request.GET.get('type', '')
     mouvements = MouvementStock.objects.select_related('piece').all()
@@ -161,17 +165,18 @@ def historique(request):
         'type_filtre': type_filtre,
         'page': 'historique',
     })
+
+
 def export_pieces_excel(request):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Pièces"
 
-    # Header style
     header_fill = PatternFill("solid", fgColor="F5C518")
     header_font = Font(bold=True, color="1A1A2E")
 
     headers = ['Description', 'Référence', 'Emplacement', 'Stock réel',
-               'Fournisseur', 'Stock min', 'Stock max', 'Type', 'Statut']
+               'Fournisseur', 'Stock min', 'Stock max', 'Type', 'Statut', 'Criticité']
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
         cell.fill = header_fill
@@ -183,10 +188,10 @@ def export_pieces_excel(request):
             piece.description, piece.reference, piece.emplacement,
             piece.stock_reel, piece.fournisseur, piece.stock_minimum,
             piece.stock_maximum, piece.get_type_piece_display(),
-            'Critique' if piece.est_critique else 'Normal'
+            'Critique' if piece.est_critique else 'Normal',
+            'OUI' if piece.criticite else 'NON',
         ])
 
-    # Auto column width
     for col in ws.columns:
         max_len = max(len(str(cell.value or '')) for cell in col)
         ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
@@ -205,7 +210,8 @@ def export_historique_excel(request):
     header_fill = PatternFill("solid", fgColor="F5C518")
     header_font = Font(bold=True, color="1A1A2E")
 
-    headers = ['Date', 'Pièce', 'Référence', 'Type mouvement', 'Quantité', 'Stock avant', 'Stock après', 'Commentaire']
+    headers = ['Date', 'Pièce', 'Référence', 'Type mouvement', 'Matricule',
+               'Quantité', 'Stock avant', 'Stock après', 'Commentaire']
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
         cell.fill = header_fill
@@ -216,8 +222,8 @@ def export_historique_excel(request):
         ws.append([
             m.date.strftime('%d/%m/%Y %H:%M'),
             m.piece.description, m.piece.reference,
-            m.type_mouvement, m.quantite,
-            m.stock_avant, m.stock_apres, m.commentaire
+            m.type_mouvement, m.matricule,
+            m.quantite, m.stock_avant, m.stock_apres, m.commentaire
         ])
 
     for col in ws.columns:
@@ -228,6 +234,8 @@ def export_historique_excel(request):
     response['Content-Disposition'] = 'attachment; filename="historique.xlsx"'
     wb.save(response)
     return response
+
+
 def liste_utilisateurs(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'admin':
         messages.error(request, "Accès réservé aux administrateurs.")
@@ -291,7 +299,7 @@ def modifier_utilisateur(request, pk):
         messages.success(request, 'Utilisateur modifié avec succès.')
         return redirect('liste_utilisateurs')
     return render(request, 'pieces/utilisateurs/form.html', {
-        'titre': 'Modifier l\'utilisateur', 'u': user, 'page': 'utilisateurs'
+        'titre': "Modifier l'utilisateur", 'u': user, 'page': 'utilisateurs'
     })
 
 
@@ -325,43 +333,64 @@ def mon_profil(request):
         messages.success(request, 'Profil mis à jour.')
         return redirect('mon_profil')
     return render(request, 'pieces/utilisateurs/profil.html', {'page': 'profil'})
-def export_critiques_excel(request):
+def export_alertes_excel(request):
     wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Pièces Critiques"
-
-    header_fill = PatternFill("solid", fgColor="FF4757")
+    
+    # Feuille 1 - Critiques OUI
+    ws1 = wb.active
+    ws1.title = "Critiques OUI"
+    header_fill = PatternFill("solid", fgColor="FF0000")
     header_font = Font(bold=True, color="FFFFFF")
-
-    headers = ['Description', 'Référence', 'Emplacement', 'Stock réel', 'Stock minimum', 'Fournisseur', 'Type', 'Statut']
+    headers = ['Référence', 'Description', 'Emplacement', 'Stock réel', 'Stock min', 'Fournisseur', 'Type', 'Criticité']
     for col, h in enumerate(headers, 1):
-        cell = ws.cell(row=1, column=col, value=h)
+        cell = ws1.cell(row=1, column=col, value=h)
         cell.fill = header_fill
         cell.font = header_font
         cell.alignment = Alignment(horizontal='center')
-
     pieces = Piece.objects.all()
-    critiques = [p for p in pieces if p.est_critique]
-    basses = [p for p in pieces if p.statut_stock == 'bas']
+    critiques_oui = [p for p in pieces if p.est_critique and p.criticite]
+    for piece in critiques_oui:
+        ws1.append([piece.reference, piece.description, piece.emplacement,
+                    piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+                    piece.get_type_piece_display(), 'OUI'])
 
-    for piece in critiques:
-        ws.append([
-            piece.description, piece.reference, piece.emplacement,
-            piece.stock_reel, piece.stock_minimum, piece.fournisseur,
-            piece.get_type_piece_display(), 'Critique'
-        ])
-    for piece in basses:
-        ws.append([
-            piece.description, piece.reference, piece.emplacement,
-            piece.stock_reel, piece.stock_minimum, piece.fournisseur,
-            piece.get_type_piece_display(), 'Stock bas'
-        ])
+    # Feuille 2 - Critiques NON
+    ws2 = wb.create_sheet("Critiques NON")
+    header_fill2 = PatternFill("solid", fgColor="FFC107")
+    header_font2 = Font(bold=True, color="000000")
+    for col, h in enumerate(headers, 1):
+        cell = ws2.cell(row=1, column=col, value=h)
+        cell.fill = header_fill2
+        cell.font = header_font2
+        cell.alignment = Alignment(horizontal='center')
+    critiques_non = [p for p in pieces if p.est_critique and not p.criticite]
+    for piece in critiques_non:
+        ws2.append([piece.reference, piece.description, piece.emplacement,
+                    piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+                    piece.get_type_piece_display(), 'NON'])
 
-    for col in ws.columns:
-        max_len = max(len(str(cell.value or '')) for cell in col)
-        ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+    # Feuille 3 - A surveiller
+    ws3 = wb.create_sheet("A surveiller")
+    header_fill3 = PatternFill("solid", fgColor="0D6EFD")
+    header_font3 = Font(bold=True, color="FFFFFF")
+    for col, h in enumerate(headers, 1):
+        cell = ws3.cell(row=1, column=col, value=h)
+        cell.fill = header_fill3
+        cell.font = header_font3
+        cell.alignment = Alignment(horizontal='center')
+    a_surveiller = [p for p in pieces if p.statut_stock == 'bas']
+    for piece in a_surveiller:
+        ws3.append([piece.reference, piece.description, piece.emplacement,
+                    piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+                    piece.get_type_piece_display(), 'OUI' if piece.criticite else 'NON'])
+
+    # Auto width toutes les feuilles
+    for ws in [ws1, ws2, ws3]:
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
 
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="pieces_critiques.xlsx"'
+    response['Content-Disposition'] = 'attachment; filename="alertes_stock.xlsx"'
     wb.save(response)
     return response

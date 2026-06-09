@@ -34,9 +34,15 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
             <thead><tr>
-                <th class="ps-3">Date</th><th>Pièce</th><th>Référence</th>
-                <th>Type</th><th>Quantité</th><th>Stock avant</th>
-                <th>Stock après</th><th class="pe-3">Commentaire</th>
+                <th class="ps-3">Date</th>
+                <th>Pièce</th>
+                <th>Référence</th>
+                <th>Type</th>
+                <th>Matricule</th>
+                <th>Quantité</th>
+                <th>Stock avant</th>
+                <th>Stock après</th>
+                <th class="pe-3">Commentaire</th>
             </tr></thead>
             <tbody>
             {% for m in mouvements %}
@@ -51,13 +57,14 @@
                     <span class="badge bg-success"><i class="bi bi-arrow-up"></i> Réception</span>
                     {% endif %}
                 </td>
+                <td>{{ m.matricule|default:"-" }}</td>
                 <td><strong>{{ m.quantite }}</strong></td>
                 <td>{{ m.stock_avant }}</td>
                 <td><strong>{{ m.stock_apres }}</strong></td>
                 <td class="pe-3 text-muted small">{{ m.commentaire|default:"-" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="8" class="text-center text-muted py-4">Aucun mouvement trouvé</td></tr>
+            <tr><td colspan="9" class="text-center text-muted py-4">Aucun mouvement trouvé</td></tr>
             {% endfor %}
             </tbody>
         </table>

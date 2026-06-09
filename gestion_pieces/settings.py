@@ -80,16 +80,6 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 CSRF_TRUSTED_ORIGINS = ['https://gestionpiecess.up.railway.app']
-import cloudinary
-
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'ton_cloud_name',
-    'API_KEY': 'ton_api_key',
-    'API_SECRET': 'ton_api_secret',
-}
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-import os
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'dkuh6i5sx'),

@@ -142,11 +142,11 @@ def reception(request):
 
 def pieces_critiques(request):
     pieces = Piece.objects.all()
-    critiques = [p for p in pieces if p.est_critique]
-    basses = [p for p in pieces if p.statut_stock == 'bas']
+    critiques_oui = [p for p in pieces if p.est_critique and p.criticite]
+    critiques_non = [p for p in pieces if p.est_critique and not p.criticite]
     return render(request, 'pieces/pieces_critiques.html', {
-        'critiques': critiques,
-        'basses': basses,
+        'critiques_oui': critiques_oui,
+        'critiques_non': critiques_non,
         'page': 'critiques',
     })
 def historique(request):

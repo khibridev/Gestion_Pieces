@@ -8,6 +8,7 @@ class TypePiece(models.TextChoices):
     MECANIQUE = 'mecanique', 'Mécanique'
     PNEUMATIQUE = 'pneumatique', 'Pneumatique'
     ELECTRIQUE = 'electrique', 'Électrique'
+    AUTRE = 'autre', 'Autre'
 
 
 class Piece(models.Model):

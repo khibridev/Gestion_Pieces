@@ -81,8 +81,10 @@
         <span class="badge-type" style="background:#e8f0fe;color:#1a73e8">⚙️ Mécan.</span>
         {% elif piece.type_piece == 'pneumatique' %}
         <span class="badge-type" style="background:#e6f4ea;color:#188038">💨 Pneum.</span>
-        {% else %}
+        {% elif piece.type_piece == 'electrique' %}
         <span class="badge-type" style="background:#fce8e6;color:#c5221f">⚡ Élec.</span>
+        {% elif piece.type_piece == 'autre' %}
+        <span class="badge-type" style="background:#f0f0f0;color:#16ffcd">🔧 Autre</span>
         {% endif %}
     </td>
     <td>

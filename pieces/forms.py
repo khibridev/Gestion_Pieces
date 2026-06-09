@@ -43,6 +43,11 @@ class ConsommationForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Motif de consommation...'}),
         label='Commentaire'
     )
+    date = forms.DateTimeField(
+    required=False,
+    widget=forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+    label='Date (laisser vide = maintenant)'
+)
 
 class ReceptionForm(forms.Form):
     piece = forms.ModelChoiceField(
@@ -56,13 +61,13 @@ class ReceptionForm(forms.Form):
         widget=forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         label='Quantité reçue'
     )
-    matricule = forms.CharField(
-    max_length=50,
-    widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Matricule du technicien'}),
-    label='Matricule technicien'
-    )   
     commentaire = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'N° bon de livraison, fournisseur...'}),
         label='Commentaire'
     )
+    date = forms.DateTimeField(
+    required=False,
+    widget=forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+    label='Date (laisser vide = maintenant)'
+)

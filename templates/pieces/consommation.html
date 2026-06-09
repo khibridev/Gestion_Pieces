@@ -47,6 +47,10 @@
                     {% for field in form %}{% for error in field.errors %}<div>{{ error }}</div>{% endfor %}{% endfor %}
                 </div>
                 {% endif %}
+                <div class="mb-3">
+                        <label class="form-label fw-semibold">Date <span class="text-muted small">(optionnel)</span></label>
+                        {{ form.date }}
+                </div>
                 <button type="submit" class="btn btn-warning fw-bold w-100">
                     <i class="bi bi-arrow-down-circle me-2"></i>Enregistrer la consommation
                 </button>

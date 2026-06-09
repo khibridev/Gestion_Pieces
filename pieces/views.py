@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db.models import Q
+from django.utils import timezone
 from .models import Piece, MouvementStock
 from .forms import PieceForm, ConsommationForm, ReceptionForm
 import openpyxl
@@ -92,6 +93,7 @@ def consommation(request):
             piece = form.cleaned_data['piece']
             quantite = form.cleaned_data['quantite']
             commentaire = form.cleaned_data.get('commentaire', '')
+            date_mouvement = form.cleaned_data.get('date') or timezone.now()
             if quantite > piece.stock_reel:
                 messages.error(request, f'Stock insuffisant. Stock actuel : {piece.stock_reel}')
             else:
@@ -106,6 +108,7 @@ def consommation(request):
                     stock_apres=piece.stock_reel,
                     commentaire=commentaire,
                     matricule=form.cleaned_data.get('matricule', ''),
+                    date=date_mouvement,
                 )
                 messages.success(request, f'Consommation enregistrée. Nouveau stock : {piece.stock_reel}')
                 return redirect('consommation')
@@ -122,6 +125,7 @@ def reception(request):
             piece = form.cleaned_data['piece']
             quantite = form.cleaned_data['quantite']
             commentaire = form.cleaned_data.get('commentaire', '')
+            date_mouvement = form.cleaned_data.get('date') or timezone.now()
             stock_avant = piece.stock_reel
             piece.stock_reel += quantite
             piece.save()
@@ -132,7 +136,7 @@ def reception(request):
                 stock_avant=stock_avant,
                 stock_apres=piece.stock_reel,
                 commentaire=commentaire,
-                matricule=form.cleaned_data.get('matricule', ''),
+                date=date_mouvement,
             )
             messages.success(request, f'Réception enregistrée. Nouveau stock : {piece.stock_reel}')
             return redirect('reception')
@@ -236,6 +240,62 @@ def export_historique_excel(request):
     return response
 
 
+def export_alertes_excel(request):
+    wb = openpyxl.Workbook()
+    headers = ['Référence', 'Description', 'Emplacement', 'Stock réel',
+               'Stock min', 'Fournisseur', 'Type', 'Statut', 'Criticité']
+
+    pieces = list(Piece.objects.all())
+    critiques_oui = [p for p in pieces if p.est_critique and p.criticite]
+    critiques_non = [p for p in pieces if p.est_critique and not p.criticite]
+    a_surveiller = [p for p in pieces if p.statut_stock == 'bas']
+
+    def style_header(ws, fill_color, font_color):
+        header_fill = PatternFill("solid", fgColor=fill_color)
+        header_font = Font(bold=True, color=font_color)
+        for col, h in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=h)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal='center')
+
+    def add_pieces(ws, liste, statut_label):
+        for piece in liste:
+            ws.append([
+                piece.reference, piece.description, piece.emplacement,
+                piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+                piece.get_type_piece_display(),
+                statut_label,
+                'OUI' if piece.criticite else 'NON',
+            ])
+
+    def auto_width(ws):
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+
+    ws1 = wb.active
+    ws1.title = "Critiques OUI"
+    style_header(ws1, "FF0000", "FFFFFF")
+    add_pieces(ws1, critiques_oui, 'Critique')
+    auto_width(ws1)
+
+    ws2 = wb.create_sheet("Critiques NON")
+    style_header(ws2, "FFC107", "000000")
+    add_pieces(ws2, critiques_non, 'Critique')
+    auto_width(ws2)
+
+    ws3 = wb.create_sheet("A surveiller")
+    style_header(ws3, "0D6EFD", "FFFFFF")
+    add_pieces(ws3, a_surveiller, 'Stock bas')
+    auto_width(ws3)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="alertes_stock.xlsx"'
+    wb.save(response)
+    return response
+
+
 def liste_utilisateurs(request):
     if not hasattr(request.user, 'profile') or request.user.profile.role != 'admin':
         messages.error(request, "Accès réservé aux administrateurs.")
@@ -333,64 +393,3 @@ def mon_profil(request):
         messages.success(request, 'Profil mis à jour.')
         return redirect('mon_profil')
     return render(request, 'pieces/utilisateurs/profil.html', {'page': 'profil'})
-def export_alertes_excel(request):
-    wb = openpyxl.Workbook()
-    
-    # Feuille 1 - Critiques OUI
-    ws1 = wb.active
-    ws1.title = "Critiques OUI"
-    header_fill = PatternFill("solid", fgColor="FF0000")
-    header_font = Font(bold=True, color="FFFFFF")
-    headers = ['Référence', 'Description', 'Emplacement', 'Stock réel', 'Stock min', 'Fournisseur', 'Type', 'Criticité']
-    for col, h in enumerate(headers, 1):
-        cell = ws1.cell(row=1, column=col, value=h)
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = Alignment(horizontal='center')
-    pieces = Piece.objects.all()
-    critiques_oui = [p for p in pieces if p.est_critique and p.criticite]
-    for piece in critiques_oui:
-        ws1.append([piece.reference, piece.description, piece.emplacement,
-                    piece.stock_reel, piece.stock_minimum, piece.fournisseur,
-                    piece.get_type_piece_display(), 'OUI'])
-
-    # Feuille 2 - Critiques NON
-    ws2 = wb.create_sheet("Critiques NON")
-    header_fill2 = PatternFill("solid", fgColor="FFC107")
-    header_font2 = Font(bold=True, color="000000")
-    for col, h in enumerate(headers, 1):
-        cell = ws2.cell(row=1, column=col, value=h)
-        cell.fill = header_fill2
-        cell.font = header_font2
-        cell.alignment = Alignment(horizontal='center')
-    critiques_non = [p for p in pieces if p.est_critique and not p.criticite]
-    for piece in critiques_non:
-        ws2.append([piece.reference, piece.description, piece.emplacement,
-                    piece.stock_reel, piece.stock_minimum, piece.fournisseur,
-                    piece.get_type_piece_display(), 'NON'])
-
-    # Feuille 3 - A surveiller
-    ws3 = wb.create_sheet("A surveiller")
-    header_fill3 = PatternFill("solid", fgColor="0D6EFD")
-    header_font3 = Font(bold=True, color="FFFFFF")
-    for col, h in enumerate(headers, 1):
-        cell = ws3.cell(row=1, column=col, value=h)
-        cell.fill = header_fill3
-        cell.font = header_font3
-        cell.alignment = Alignment(horizontal='center')
-    a_surveiller = [p for p in pieces if p.statut_stock == 'bas']
-    for piece in a_surveiller:
-        ws3.append([piece.reference, piece.description, piece.emplacement,
-                    piece.stock_reel, piece.stock_minimum, piece.fournisseur,
-                    piece.get_type_piece_display(), 'OUI' if piece.criticite else 'NON'])
-
-    # Auto width toutes les feuilles
-    for ws in [ws1, ws2, ws3]:
-        for col in ws.columns:
-            max_len = max(len(str(cell.value or '')) for cell in col)
-            ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
-
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="alertes_stock.xlsx"'
-    wb.save(response)
-    return response

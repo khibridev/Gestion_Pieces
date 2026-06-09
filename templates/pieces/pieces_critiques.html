@@ -131,7 +131,10 @@
                 <td>
                     {% if piece.type_piece == 'mecanique' %}⚙️ Mécan.
                     {% elif piece.type_piece == 'pneumatique' %}💨 Pneum.
-                    {% else %}⚡ Élec.{% endif %}
+                    {% elif piece.type_piece == 'electrique' %}⚡ Élec.
+                    {% else %}{% elif piece.type_piece == 'autre' %}<span class="badge-type" style="background:#f0f0f0;color:#555">🔧 Autre</span>
+                    {% endif %}
+                    
                 </td>
                 <td>
                     {% if piece.criticite %}

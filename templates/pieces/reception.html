@@ -35,10 +35,6 @@
                     {{ form.quantite }}
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Matricule technicien</label>
-                    {{ form.matricule }}
-                </div>
-                <div class="mb-3">
                     <label class="form-label fw-semibold">Commentaire / N° BL</label>
                     {{ form.commentaire }}
                 </div>
@@ -47,6 +43,10 @@
                     {% for field in form %}{% for error in field.errors %}<div>{{ error }}</div>{% endfor %}{% endfor %}
                 </div>
                 {% endif %}
+                <div class="mb-3">
+    <label class="form-label fw-semibold">Date <span class="text-muted small">(optionnel)</span></label>
+    {{ form.date }}
+</div>
                 <button type="submit" class="btn btn-success fw-bold w-100">
                     <i class="bi bi-arrow-up-circle me-2"></i>Enregistrer la réception
                 </button>

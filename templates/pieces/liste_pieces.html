@@ -21,20 +21,23 @@
 <div class="card mb-3">
     <div class="card-body py-2">
         <form method="get" class="row g-2 align-items-end">
-            <div class="col-md-5">
+            <div class="col-md-3">
                 <input type="text" name="q" value="{{ query }}" class="form-control"
-                       placeholder="Rechercher par description, référence, fournisseur...">
+                       placeholder="Rechercher description, référence...">
             </div>
             <div class="col-md-3">
-                <select name="type" class="form-select">
-                    <option value="">-- Tous les types --</option>
-                    <option value="mecanique" {% if type_filtre == 'mecanique' %}selected{% endif %}>Mécanique</option>
-                    <option value="pneumatique" {% if type_filtre == 'pneumatique' %}selected{% endif %}>Pneumatique</option>
-                    <option value="electrique" {% if type_filtre == 'electrique' %}selected{% endif %}>Électrique</option>
+                <input type="text" name="emplacement" value="{{ emplacement_filtre }}" class="form-control"
+                       placeholder="Rechercher par emplacement...">
+            </div>
+            <div class="col-md-2">
+                <select name="criticite" class="form-select">
+                    <option value="">-- Criticité --</option>
+                    <option value="oui" {% if criticite_filtre == 'oui' %}selected{% endif %}>⚠️ Critique</option>
+                    <option value="non" {% if criticite_filtre == 'non' %}selected{% endif %}>✅ Non critique</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>Filtrer</button>
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
             </div>
             <div class="col-md-2">
                 <a href="/pieces/" class="btn btn-outline-secondary w-100">Réinitialiser</a>

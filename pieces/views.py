@@ -13,7 +13,7 @@ from .models import Profile
 def dashboard(request):
     pieces = Piece.objects.all()
     total = pieces.count()
-    critiques = sum(1 for p in pieces if p.est_critique)
+    critiques = pieces.filter(criticite=True).count()
     derniers_mouvements = MouvementStock.objects.select_related('piece').all()[:10]
     context = {
         'total_pieces': total,
@@ -26,7 +26,8 @@ def dashboard(request):
 
 def liste_pieces(request):
     query = request.GET.get('q', '')
-    type_filtre = request.GET.get('type', '')
+    emplacement_filtre = request.GET.get('emplacement', '')
+    criticite_filtre = request.GET.get('criticite', '')
     pieces = Piece.objects.all()
     if query:
         pieces = pieces.filter(
@@ -34,12 +35,17 @@ def liste_pieces(request):
             Q(reference__icontains=query) |
             Q(fournisseur__icontains=query)
         )
-    if type_filtre:
-        pieces = pieces.filter(type_piece=type_filtre)
+    if emplacement_filtre:
+        pieces = pieces.filter(emplacement__icontains=emplacement_filtre)
+    if criticite_filtre == 'oui':
+        pieces = pieces.filter(criticite=True)
+    elif criticite_filtre == 'non':
+        pieces = pieces.filter(criticite=False)
     context = {
         'pieces': pieces,
         'query': query,
-        'type_filtre': type_filtre,
+        'emplacement_filtre': emplacement_filtre,
+        'criticite_filtre': criticite_filtre,
         'page': 'pieces',
     }
     return render(request, 'pieces/liste_pieces.html', context)

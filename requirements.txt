@@ -3,3 +3,5 @@ pillow
 openpyxl
 gunicorn
 whitenoise
+cloudinary
+django-cloudinary-storage

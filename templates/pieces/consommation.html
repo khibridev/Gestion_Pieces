@@ -12,7 +12,13 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Pièce *</label>
-                    {{ form.piece }}
+                    <input type="text" id="searchPiece" class="form-control mb-2" placeholder="Rechercher par emplacement ou référence...">
+                    <select name="piece" id="id_piece" class="form-select" size="5" style="height:auto;">
+                        <option value="">-- Sélectionner une pièce --</option>
+                        {% for piece in form.piece.field.queryset %}
+                        <option value="{{ piece.pk }}">{{ piece.emplacement }} - {{ piece.reference }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div id="stockInfo" class="piece-info-box mb-3" style="display:none">
                     <div class="d-flex justify-content-between">
@@ -20,8 +26,8 @@
                         <strong id="stockActuel" class="text-primary">—</strong>
                     </div>
                     <div class="d-flex justify-content-between mt-1">
-                        <span class="small text-muted">Emplacement :</span>
-                        <span id="emplacementInfo" class="badge bg-secondary">—</span>
+                        <span class="small text-muted">Description :</span>
+                        <span id="descriptionInfo" class="text-muted small">—</span>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -42,7 +48,6 @@
                 </button>
             </form>
         </div>
-
     </div>
     <div class="col-md-7">
         <div class="card">
@@ -79,7 +84,10 @@
 <script>
 const stockData = {
     {% for piece in form.piece.field.queryset %}
-    "{{ piece.pk }}": { stock: {{ piece.stock_reel }}, emplacement: "{{ piece.emplacement }}" },
+    "{{ piece.pk }}": { 
+        stock: {{ piece.stock_reel }}, 
+        description: "{{ piece.description }}"
+    },
     {% endfor %}
 };
 document.getElementById('id_piece').addEventListener('change', function() {
@@ -87,10 +95,19 @@ document.getElementById('id_piece').addEventListener('change', function() {
     if (val && stockData[val]) {
         document.getElementById('stockInfo').style.display = 'block';
         document.getElementById('stockActuel').textContent = stockData[val].stock;
-        document.getElementById('emplacementInfo').textContent = stockData[val].emplacement;
+        document.getElementById('descriptionInfo').textContent = stockData[val].description;
     } else {
         document.getElementById('stockInfo').style.display = 'none';
     }
+});
+document.getElementById('searchPiece').addEventListener('input', function() {
+    const search = this.value.toLowerCase();
+    const select = document.getElementById('id_piece');
+    const options = select.querySelectorAll('option');
+    options.forEach(opt => {
+        if (opt.value === '') return;
+        opt.style.display = opt.text.toLowerCase().includes(search) ? '' : 'none';
+    });
 });
 </script>
 {% endblock %}

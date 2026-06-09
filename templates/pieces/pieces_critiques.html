@@ -129,12 +129,15 @@
                 <td>{{ piece.stock_minimum }}</td>
                 <td>{{ piece.fournisseur }}</td>
                 <td>
-                    {% if piece.type_piece == 'mecanique' %}⚙️ Mécan.
-                    {% elif piece.type_piece == 'pneumatique' %}💨 Pneum.
-                    {% elif piece.type_piece == 'electrique' %}⚡ Élec.
-                    {% else %}{% elif piece.type_piece == 'autre' %}<span class="badge-type" style="background:#f0f0f0;color:#555">🔧 Autre</span>
-                    {% endif %}
-                    
+                {% if piece.type_piece == 'mecanique' %}
+                    ⚙️ Mécan.
+                {% elif piece.type_piece == 'pneumatique' %}
+                    💨 Pneum.
+                {% elif piece.type_piece == 'electrique' %}
+                    ⚡ Élec.
+{               % elif piece.type_piece == 'autre' %}
+                    <span class="badge-type" style="background:#f0f0f0;color:#555">🔧 Autre</span>
+                {% endif %}
                 </td>
                 <td>
                     {% if piece.criticite %}

@@ -12,6 +12,7 @@ class TypePiece(models.TextChoices):
 
 
 class Piece(models.Model):
+    code = models.CharField(max_length=50, unique=True, verbose_name="Code", blank=True, null=True, default=None)
     description = models.CharField(max_length=200, verbose_name="Description")
     reference = models.CharField(max_length=100, unique=True, verbose_name="Référence")
     emplacement = models.CharField(max_length=100, verbose_name="Emplacement")

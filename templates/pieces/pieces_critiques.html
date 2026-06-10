@@ -23,14 +23,15 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
             <thead><tr>
-                <th class="ps-3">Référence</th><th>Description</th><th>Emplacement</th>
+                <th class="ps-3">Code</th><th>Référence</th><th>Description</th><th>Emplacement</th>
                 <th>Stock réel</th><th>Stock min.</th><th>Fournisseur</th>
                 <th>Type</th><th>Criticité</th><th class="pe-3">Action</th>
             </tr></thead>
             <tbody>
             {% for piece in critiques_oui %}
             <tr class="table-danger">
-                <td class="ps-3"><strong>{{ piece.reference }}</strong></td>
+                <td class="ps-3"><span class="badge bg-dark font-monospace">{{ piece.code }}</span></td>
+                <td><strong>{{ piece.reference }}</strong></td>
                 <td>{{ piece.description }}</td>
                 <td><span class="badge bg-secondary">{{ piece.emplacement }}</span></td>
                 <td><strong class="text-danger fs-5">{{ piece.stock_reel }}</strong></td>
@@ -39,7 +40,9 @@
                 <td>
                     {% if piece.type_piece == 'mecanique' %}⚙️ Mécan.
                     {% elif piece.type_piece == 'pneumatique' %}💨 Pneum.
-                    {% else %}⚡ Élec.{% endif %}
+                    {% elif piece.type_piece == 'electrique' %}⚡ Élec.
+                    {% elif piece.type_piece == 'autre' %}<span style="background:#f0f0f0;color:#555">🔧 Autre</span>
+                    {% endif %}
                 </td>
                 <td><span class="badge bg-danger">⚠️ Oui</span></td>
                 <td class="pe-3">
@@ -69,14 +72,15 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
             <thead><tr>
-                <th class="ps-3">Référence</th><th>Description</th><th>Emplacement</th>
+                <th class="ps-3">Code</th><th>Référence</th><th>Description</th><th>Emplacement</th>
                 <th>Stock réel</th><th>Stock min.</th><th>Fournisseur</th>
                 <th>Type</th><th>Criticité</th><th class="pe-3">Action</th>
             </tr></thead>
             <tbody>
             {% for piece in critiques_non %}
             <tr class="table-warning">
-                <td class="ps-3"><strong>{{ piece.reference }}</strong></td>
+                <td class="ps-3"><span class="badge bg-dark font-monospace">{{ piece.code }}</span></td>
+                <td><strong>{{ piece.reference }}</strong></td>
                 <td>{{ piece.description }}</td>
                 <td><span class="badge bg-secondary">{{ piece.emplacement }}</span></td>
                 <td><strong>{{ piece.stock_reel }}</strong></td>
@@ -85,7 +89,9 @@
                 <td>
                     {% if piece.type_piece == 'mecanique' %}⚙️ Mécan.
                     {% elif piece.type_piece == 'pneumatique' %}💨 Pneum.
-                    {% else %}⚡ Élec.{% endif %}
+                    {% elif piece.type_piece == 'electrique' %}⚡ Élec.
+                    {% elif piece.type_piece == 'autre' %}<span style="background:#f0f0f0;color:#555">🔧 Autre</span>
+                    {% endif %}
                 </td>
                 <td><span class="badge bg-success">✅ Non</span></td>
                 <td class="pe-3">
@@ -115,29 +121,26 @@
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
             <thead><tr>
-                <th class="ps-3">Référence</th><th>Description</th><th>Emplacement</th>
+                <th class="ps-3">Code</th><th>Référence</th><th>Description</th><th>Emplacement</th>
                 <th>Stock réel</th><th>Stock min.</th><th>Fournisseur</th>
                 <th>Type</th><th>Criticité</th><th class="pe-3">Action</th>
             </tr></thead>
             <tbody>
             {% for piece in a_surveiller %}
             <tr>
-                <td class="ps-3"><strong>{{ piece.reference }}</strong></td>
+                <td class="ps-3"><span class="badge bg-dark font-monospace">{{ piece.code }}</span></td>
+                <td><strong>{{ piece.reference }}</strong></td>
                 <td>{{ piece.description }}</td>
                 <td><span class="badge bg-secondary">{{ piece.emplacement }}</span></td>
                 <td><strong>{{ piece.stock_reel }}</strong></td>
                 <td>{{ piece.stock_minimum }}</td>
                 <td>{{ piece.fournisseur }}</td>
                 <td>
-                {% if piece.type_piece == 'mecanique' %}
-                    ⚙️ Mécan.
-                {% elif piece.type_piece == 'pneumatique' %}
-                    💨 Pneum.
-                {% elif piece.type_piece == 'electrique' %}
-                    ⚡ Élec.
-{               % elif piece.type_piece == 'autre' %}
-                    <span class="badge-type" style="background:#f0f0f0;color:#555">🔧 Autre</span>
-                {% endif %}
+                    {% if piece.type_piece == 'mecanique' %}⚙️ Mécan.
+                    {% elif piece.type_piece == 'pneumatique' %}💨 Pneum.
+                    {% elif piece.type_piece == 'electrique' %}⚡ Élec.
+                    {% elif piece.type_piece == 'autre' %}<span style="background:#f0f0f0;color:#555">🔧 Autre</span>
+                    {% endif %}
                 </td>
                 <td>
                     {% if piece.criticite %}
@@ -153,7 +156,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr><td colspan="9" class="text-center text-muted py-4">Aucune pièce à surveiller</td></tr>
+            <tr><td colspan="10" class="text-center text-muted py-4">Aucune pièce à surveiller</td></tr>
             {% endfor %}
             </tbody>
         </table>

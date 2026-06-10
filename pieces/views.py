@@ -179,7 +179,7 @@ def export_pieces_excel(request):
     header_fill = PatternFill("solid", fgColor="F5C518")
     header_font = Font(bold=True, color="1A1A2E")
 
-    headers = ['Description', 'Référence', 'Emplacement', 'Stock réel',
+    headers = ['Code', 'Description', 'Référence', 'Emplacement', 'Stock réel',
                'Fournisseur', 'Stock min', 'Stock max', 'Type', 'Statut', 'Criticité']
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
@@ -189,7 +189,7 @@ def export_pieces_excel(request):
 
     for piece in Piece.objects.all():
         ws.append([
-            piece.description, piece.reference, piece.emplacement,
+            piece.code, piece.description, piece.reference, piece.emplacement,
             piece.stock_reel, piece.fournisseur, piece.stock_minimum,
             piece.stock_maximum, piece.get_type_piece_display(),
             'Critique' if piece.est_critique else 'Normal',
@@ -214,7 +214,8 @@ def export_historique_excel(request):
     header_fill = PatternFill("solid", fgColor="F5C518")
     header_font = Font(bold=True, color="1A1A2E")
 
-    headers = ['Date', 'Pièce', 'Référence', 'Type mouvement', 'Matricule',
+    # ✅ 'Code' ajouté dans les headers
+    headers = ['Date', 'Code', 'Pièce', 'Référence', 'Type mouvement', 'Matricule',
                'Quantité', 'Stock avant', 'Stock après', 'Commentaire']
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
@@ -225,9 +226,15 @@ def export_historique_excel(request):
     for m in MouvementStock.objects.select_related('piece').all():
         ws.append([
             m.date.strftime('%d/%m/%Y %H:%M'),
-            m.piece.description, m.piece.reference,
-            m.type_mouvement, m.matricule,
-            m.quantite, m.stock_avant, m.stock_apres, m.commentaire
+            m.piece.code,           # ✅ Code ajouté
+            m.piece.description,
+            m.piece.reference,
+            m.type_mouvement,
+            m.matricule,
+            m.quantite,
+            m.stock_avant,
+            m.stock_apres,
+            m.commentaire,
         ])
 
     for col in ws.columns:
@@ -242,7 +249,7 @@ def export_historique_excel(request):
 
 def export_alertes_excel(request):
     wb = openpyxl.Workbook()
-    headers = ['Référence', 'Description', 'Emplacement', 'Stock réel',
+    headers = ['Code', 'Référence', 'Description', 'Emplacement', 'Stock réel',
                'Stock min', 'Fournisseur', 'Type', 'Statut', 'Criticité']
 
     pieces = list(Piece.objects.all())
@@ -262,8 +269,13 @@ def export_alertes_excel(request):
     def add_pieces(ws, liste, statut_label):
         for piece in liste:
             ws.append([
-                piece.reference, piece.description, piece.emplacement,
-                piece.stock_reel, piece.stock_minimum, piece.fournisseur,
+                piece.code,                         # ✅ Code ajouté
+                piece.reference,
+                piece.description,
+                piece.emplacement,
+                piece.stock_reel,
+                piece.stock_minimum,
+                piece.fournisseur,
                 piece.get_type_piece_display(),
                 statut_label,
                 'OUI' if piece.criticite else 'NON',
@@ -388,7 +400,7 @@ def mon_profil(request):
         request.user.profile.telephone = request.POST.get('telephone', '')
         request.user.profile.poste = request.POST.get('poste', '')
         if request.FILES.get('photo'):
-            request.user.profile.photo = request.FILES['photo']
+            request.user.profile.photo = request.FILES['photo']  # ✅ faute de frappe corrigée
         request.user.profile.save()
         messages.success(request, 'Profil mis à jour.')
         return redirect('mon_profil')

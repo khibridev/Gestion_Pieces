@@ -5,9 +5,10 @@ from .models import Piece
 class PieceForm(forms.ModelForm):
     class Meta:
         model = Piece
-        fields = ['description', 'reference', 'emplacement', 'stock_reel',
+        fields = ['code','description', 'reference', 'emplacement', 'stock_reel',
           'fournisseur', 'stock_minimum', 'stock_maximum', 'type_piece', 'criticite' ,'photo']
         widgets = {
+            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: PC-001'}),
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de la pièce'}),
             'reference': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: REF-001'}),
             'emplacement': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: B1:1'}),

@@ -44,9 +44,9 @@
                 </div>
                 {% endif %}
                 <div class="mb-3">
-    <label class="form-label fw-semibold">Date <span class="text-muted small">(optionnel)</span></label>
-    {{ form.date }}
-</div>
+                    <label class="form-label fw-semibold">Date <span class="text-muted small">(optionnel)</span></label>
+                    {{ form.date }}
+                </div>
                 <button type="submit" class="btn btn-success fw-bold w-100">
                     <i class="bi bi-arrow-up-circle me-2"></i>Enregistrer la réception
                 </button>
@@ -62,6 +62,7 @@
                 <table class="table table-hover mb-0 small">
                     <thead><tr>
                         <th class="ps-3">Date</th>
+                        <th>Code</th>
                         <th>Pièce</th>
                         <th>Qté</th>
                         <th>Avant</th>
@@ -73,6 +74,7 @@
                     {% for m in historique %}
                     <tr>
                         <td class="ps-3 text-muted">{{ m.date|date:"d/m/y H:i" }}</td>
+                        <td><span class="badge bg-dark font-monospace">{{ m.piece.code }}</span></td>
                         <td><strong>{{ m.piece.reference }}</strong><br>
                             <span class="text-muted">{{ m.piece.description|truncatechars:25 }}</span></td>
                         <td><span class="badge bg-success">+{{ m.quantite }}</span></td>
@@ -82,7 +84,7 @@
                         <td class="pe-3 text-muted">{{ m.commentaire|truncatechars:20 }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="7" class="text-center text-muted py-4">Aucune réception enregistrée</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted py-4">Aucune réception enregistrée</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

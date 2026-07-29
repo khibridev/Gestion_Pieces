@@ -405,3 +405,52 @@ def mon_profil(request):
         messages.success(request, 'Profil mis à jour.')
         return redirect('mon_profil')
     return render(request, 'pieces/utilisateurs/profil.html', {'page': 'profil'})
+def import_pieces_excel(request):
+    if request.method == 'POST' and request.FILES.get('fichier'):
+        fichier = request.FILES['fichier']
+        try:
+            wb = openpyxl.load_workbook(fichier)
+            ws = wb.active
+            importees = 0
+            erreurs = []
+            for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+                try:
+                    row_list = (list(row) + [None]*11)[:11]
+                    code, description, reference, emplacement, stock_reel, fournisseur, stock_min, stock_max, type_piece, statut, criticite = row_list
+                    if not reference or not description:
+                        continue
+                    type_map = {
+                        'mécanique': 'mecanique', 'mecanique': 'mecanique',
+                        'pneumatique': 'pneumatique',
+                        'électrique': 'electrique', 'electrique': 'electrique',
+                        'autre': 'autre',
+                    }
+                    type_piece_val = type_map.get(str(type_piece).lower().strip(), 'mecanique') if type_piece else 'mecanique'
+                    criticite_val = str(criticite).upper().strip() == 'OUI' if criticite else False
+
+                    Piece.objects.update_or_create(
+                        reference=str(reference).strip(),
+                        defaults={
+                            'code': str(code).strip() if code else None,
+                            'description': str(description).strip() if description else '',
+                            'emplacement': str(emplacement).strip() if emplacement else '',
+                            'stock_reel': int(float(str(stock_reel))) if stock_reel is not None else 0,
+                            'fournisseur': str(fournisseur).strip() if fournisseur else '',
+                            'stock_minimum': int(float(str(stock_min))) if stock_min is not None else 0,
+                            'stock_maximum': int(float(str(stock_max))) if stock_max is not None else 100,
+                            'type_piece': type_piece_val,
+                            'criticite': criticite_val,
+                        }
+                    )
+                    importees += 1
+                except Exception as e:
+                    erreurs.append(f'Ligne {row_num} : {str(e)}')
+
+            if erreurs:
+                messages.warning(request, f'{importees} pièce(s) importée(s). Erreurs : {", ".join(erreurs[:3])}')
+            else:
+                messages.success(request, f'{importees} pièce(s) importée(s) avec succès.')
+        except Exception as e:
+            messages.error(request, f'Erreur lors de la lecture du fichier : {str(e)}')
+        return redirect('liste_pieces')
+    return render(request, 'pieces/import_pieces.html', {'page': 'pieces'})

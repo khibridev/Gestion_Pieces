@@ -20,5 +20,5 @@ urlpatterns = [
     path('utilisateurs/<int:pk>/supprimer/', login_required(views.supprimer_utilisateur), name='supprimer_utilisateur'),
     path('profil/', login_required(views.mon_profil), name='mon_profil'),
     path('critiques/export/', login_required(views.export_alertes_excel), name='export_alertes'),
-
+    path('pieces/import/', login_required(views.import_pieces_excel), name='import_pieces'),
 ]

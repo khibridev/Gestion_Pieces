@@ -1,0 +1,23 @@
+{% extends 'pieces/base.html' %}
+{% block content %}
+<div class="page-header">
+    <h1><i class="bi bi-trash me-2 text-danger"></i>Effacer toutes les pièces</h1>
+</div>
+<div class="col-md-6">
+    <div class="card border-danger">
+        <div class="card-body text-center py-4">
+            <i class="bi bi-exclamation-triangle text-danger" style="font-size:3rem"></i>
+            <h5 class="mt-3">Attention !</h5>
+            <p class="text-danger fw-bold">Cette action va supprimer TOUTES les pièces et leur historique.</p>
+            <p class="text-muted small">Cette action est irréversible.</p>
+            <form method="post" class="d-flex gap-2 justify-content-center">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger fw-bold">
+                    <i class="bi bi-trash me-1"></i>Oui, tout supprimer
+                </button>
+                <a href="/pieces/" class="btn btn-outline-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

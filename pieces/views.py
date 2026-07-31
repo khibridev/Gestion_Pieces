@@ -454,3 +454,14 @@ def import_pieces_excel(request):
             messages.error(request, f'Erreur lors de la lecture du fichier : {str(e)}')
         return redirect('liste_pieces')
     return render(request, 'pieces/import_pieces.html', {'page': 'pieces'})
+
+
+def effacer_toutes_pieces(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'admin':
+        messages.error(request, "Accès réservé aux administrateurs.")
+        return redirect('liste_pieces')
+    if request.method == 'POST':
+        Piece.objects.all().delete()
+        messages.success(request, 'Toutes les pièces ont été supprimées.')
+        return redirect('liste_pieces')
+    return render(request, 'pieces/confirmer_effacer_tout.html', {'page': 'pieces'})

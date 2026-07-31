@@ -21,4 +21,5 @@ urlpatterns = [
     path('profil/', login_required(views.mon_profil), name='mon_profil'),
     path('critiques/export/', login_required(views.export_alertes_excel), name='export_alertes'),
     path('pieces/import/', login_required(views.import_pieces_excel), name='import_pieces'),
+    path('pieces/effacer-tout/', login_required(views.effacer_toutes_pieces), name='effacer_toutes_pieces'),
 ]

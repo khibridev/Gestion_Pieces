@@ -406,6 +406,9 @@ def mon_profil(request):
         return redirect('mon_profil')
     return render(request, 'pieces/utilisateurs/profil.html', {'page': 'profil'})
 def import_pieces_excel(request):
+    if not hasattr(request.user, 'profile') or request.user.profile.role != 'admin':
+        messages.error(request, "Accès réservé aux administrateurs.")
+        return redirect('liste_pieces')
     if request.method == 'POST' and request.FILES.get('fichier'):
         fichier = request.FILES['fichier']
         try:

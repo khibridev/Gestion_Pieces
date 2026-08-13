@@ -41,7 +41,7 @@
                 <label class="form-label fw-semibold">Rôle *</label>
                 <select name="role" class="form-select">
                     <option value="admin" {% if u.profile.role == 'admin' %}selected{% endif %}>⭐ Administrateur</option>
-                    <option value="technicien" {% if u.profile.role == 'technicien' %}selected{% endif %}>🔧 Technicien</option>
+                    <option value="technicien" {% if u.profile.role == 'Responsable' %}selected{% endif %}>🔧 Responsable</option>
                     <option value="lecteur" {% if u.profile.role == 'lecteur' %}selected{% endif %}>👁️ Lecteur</option>
                 </select>
             </div>

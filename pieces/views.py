@@ -29,6 +29,7 @@ def liste_pieces(request):
     query = request.GET.get('q', '')
     emplacement_filtre = request.GET.get('emplacement', '')
     criticite_filtre = request.GET.get('criticite', '')
+    usine_filtre = request.GET.get('usine', '')
     pieces = Piece.objects.all()
     if query:
         pieces = pieces.filter(
@@ -42,11 +43,14 @@ def liste_pieces(request):
         pieces = pieces.filter(criticite=True)
     elif criticite_filtre == 'non':
         pieces = pieces.filter(criticite=False)
+    if usine_filtre:
+        pieces = pieces.filter(usine=usine_filtre)
     context = {
         'pieces': pieces,
         'query': query,
         'emplacement_filtre': emplacement_filtre,
         'criticite_filtre': criticite_filtre,
+        'usine_filtre': usine_filtre,
         'page': 'pieces',
     }
     return render(request, 'pieces/liste_pieces.html', context)

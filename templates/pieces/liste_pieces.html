@@ -46,6 +46,14 @@
                 </select>
             </div>
             <div class="col-md-2">
+    <select name="usine" class="form-select">
+        <option value="">-- Usine --</option>
+        <option value="usine_1" {% if request.GET.usine == 'usine_1' %}selected{% endif %}>🏭 Usine 1</option>
+        <option value="usine_2" {% if request.GET.usine == 'usine_2' %}selected{% endif %}>🏭 Usine 2</option>
+        <option value="usine_3" {% if request.GET.usine == 'usine_3' %}selected{% endif %}>🏭 Usine 3</option>
+    </select>
+</div>
+            <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Filtrer</button>
             </div>
             <div class="col-md-2">
@@ -61,7 +69,7 @@
             <thead><tr>
                 <th class="ps-3">Photo</th><th>Code</th><th>Référence</th><th>Description</th><th>Emplacement</th>
                 <th>Stock réel</th><th>Fournisseur</th><th>Min / Max</th>
-                <th>Type</th><th>Statut de Stock</th><th>Criticité</th><th class="pe-3">Actions</th>
+                <th>Type</th><th>Usine</th><th>Prix</th><th>Statut de Stock</th><th>Criticité</th><th class="pe-3">Actions</th>
             </tr></thead>
             <tbody>
             {% for piece in pieces %}
@@ -97,6 +105,12 @@
         <span class="badge-type" style="background:#f0f0f0;color:#16ffcd">🔧 Autre</span>
         {% endif %}
     </td>
+    <td>
+    {% if piece.usine == 'usine_1' %} Usine 1
+    {% elif piece.usine == 'usine_2' %}Usine 2
+    {% else %} Usine 3{% endif %}
+</td>
+<td class="text-muted small">{{ piece.prix }} DH</td>
     <td>
         <span class="stock-{{ piece.statut_stock }}" style="padding:3px 8px;border-radius:12px;font-size:0.75rem;font-weight:600;">
             {% if piece.statut_stock == 'critique' %}🔴 À commander

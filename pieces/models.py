@@ -3,12 +3,17 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 
 
-
 class TypePiece(models.TextChoices):
     MECANIQUE = 'mecanique', 'Mécanique'
     PNEUMATIQUE = 'pneumatique', 'Pneumatique'
     ELECTRIQUE = 'electrique', 'Électrique'
     AUTRE = 'autre', 'Autre'
+
+
+class Usine(models.TextChoices):
+    USINE_1 = 'usine_1', 'Usine 1'
+    USINE_2 = 'usine_2', 'Usine 2'
+    USINE_3 = 'usine_3', 'Usine 3'
 
 
 class Piece(models.Model):
@@ -26,6 +31,18 @@ class Piece(models.Model):
         choices=TypePiece.choices,
         default=TypePiece.MECANIQUE,
         verbose_name="Type de pièce"
+    )
+    usine = models.CharField(
+        max_length=20,
+        choices=Usine.choices,
+        default=Usine.USINE_1,
+        verbose_name="Usine"
+    )
+    prix = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        verbose_name="Prix unitaire"
     )
     photo = models.ImageField(upload_to='pieces/', blank=True, null=True, verbose_name="Photo")
     date_creation = models.DateTimeField(default=timezone.now)
@@ -71,7 +88,7 @@ class MouvementStock(models.Model):
 
     def __str__(self):
         return f"{self.type_mouvement} - {self.piece.reference} ({self.quantite})"
-    from django.contrib.auth.models import User
+
 
 class Profile(models.Model):
     ROLES = [

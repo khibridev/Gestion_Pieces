@@ -5,8 +5,9 @@ from .models import Piece
 class PieceForm(forms.ModelForm):
     class Meta:
         model = Piece
-        fields = ['code','description', 'reference', 'emplacement', 'stock_reel',
-          'fournisseur', 'stock_minimum', 'stock_maximum', 'type_piece', 'criticite' ,'photo']
+        fields = ['code', 'description', 'reference', 'emplacement', 'stock_reel',
+          'fournisseur', 'stock_minimum', 'stock_maximum', 'type_piece', 
+          'criticite', 'usine', 'prix', 'photo']
         widgets = {
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: PC-001'}),
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom de la pièce'}),
@@ -19,6 +20,8 @@ class PieceForm(forms.ModelForm):
             'type_piece': forms.Select(attrs={'class': 'form-select'}),
             'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'criticite': forms.Select(choices=[(True, 'Oui'), (False, 'Non')], attrs={'class': 'form-select'}),
+            'usine': forms.Select(attrs={'class': 'form-select'}),
+            'prix': forms.NumberInput(attrs={'class': 'form-control', 'min': 0, 'step': '0.01', 'placeholder': 'Prix en DH'}),
         }
 
 

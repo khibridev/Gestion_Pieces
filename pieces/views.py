@@ -184,7 +184,7 @@ def export_pieces_excel(request):
     header_font = Font(bold=True, color="1A1A2E")
 
     headers = ['Code', 'Description', 'Référence', 'Emplacement', 'Stock réel',
-               'Fournisseur', 'Stock min', 'Stock max', 'Type', 'Statut', 'Criticité']
+               'Fournisseur', 'Stock min', 'Stock max', 'Type', 'Usine', 'Prix (DH)', 'Statut', 'Criticité']
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
         cell.fill = header_fill
@@ -193,9 +193,17 @@ def export_pieces_excel(request):
 
     for piece in Piece.objects.all():
         ws.append([
-            piece.code, piece.description, piece.reference, piece.emplacement,
-            piece.stock_reel, piece.fournisseur, piece.stock_minimum,
-            piece.stock_maximum, piece.get_type_piece_display(),
+            piece.code or '',
+            piece.description,
+            piece.reference,
+            piece.emplacement,
+            piece.stock_reel,
+            piece.fournisseur,
+            piece.stock_minimum,
+            piece.stock_maximum,
+            piece.get_type_piece_display(),
+            piece.get_usine_display(),
+            float(piece.prix),
             'Critique' if piece.est_critique else 'Normal',
             'OUI' if piece.criticite else 'NON',
         ])
@@ -218,9 +226,8 @@ def export_historique_excel(request):
     header_fill = PatternFill("solid", fgColor="F5C518")
     header_font = Font(bold=True, color="1A1A2E")
 
-    # ✅ 'Code' ajouté dans les headers
-    headers = ['Date', 'Code', 'Pièce', 'Référence', 'Type mouvement', 'Matricule',
-               'Quantité', 'Stock avant', 'Stock après', 'Commentaire']
+    headers = ['Date', 'Code', 'Pièce', 'Référence', 'Usine', 'Prix (DH)',
+               'Type mouvement', 'Matricule', 'Quantité', 'Stock avant', 'Stock après', 'Commentaire']
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
         cell.fill = header_fill
@@ -230,15 +237,17 @@ def export_historique_excel(request):
     for m in MouvementStock.objects.select_related('piece').all():
         ws.append([
             m.date.strftime('%d/%m/%Y %H:%M'),
-            m.piece.code,           # ✅ Code ajouté
+            m.piece.code or '',
             m.piece.description,
             m.piece.reference,
+            m.piece.get_usine_display(),
+            float(m.piece.prix),
             m.type_mouvement,
             m.matricule,
             m.quantite,
             m.stock_avant,
             m.stock_apres,
-            m.commentaire,
+            m.commentaire
         ])
 
     for col in ws.columns:
@@ -254,12 +263,7 @@ def export_historique_excel(request):
 def export_alertes_excel(request):
     wb = openpyxl.Workbook()
     headers = ['Code', 'Référence', 'Description', 'Emplacement', 'Stock réel',
-               'Stock min', 'Fournisseur', 'Type', 'Statut', 'Criticité']
-
-    pieces = list(Piece.objects.all())
-    critiques_oui = [p for p in pieces if p.est_critique and p.criticite]
-    critiques_non = [p for p in pieces if p.est_critique and not p.criticite]
-    a_surveiller = [p for p in pieces if p.statut_stock == 'bas']
+               'Stock min', 'Fournisseur', 'Type', 'Usine', 'Prix (DH)', 'Statut', 'Criticité']
 
     def style_header(ws, fill_color, font_color):
         header_fill = PatternFill("solid", fgColor=fill_color)
@@ -273,7 +277,7 @@ def export_alertes_excel(request):
     def add_pieces(ws, liste, statut_label):
         for piece in liste:
             ws.append([
-                piece.code,                         # ✅ Code ajouté
+                piece.code or '',
                 piece.reference,
                 piece.description,
                 piece.emplacement,
@@ -281,9 +285,42 @@ def export_alertes_excel(request):
                 piece.stock_minimum,
                 piece.fournisseur,
                 piece.get_type_piece_display(),
+                piece.get_usine_display(),
+                float(piece.prix),
                 statut_label,
                 'OUI' if piece.criticite else 'NON',
             ])
+
+    def auto_width(ws):
+        for col in ws.columns:
+            max_len = max(len(str(cell.value or '')) for cell in col)
+            ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+
+    pieces = list(Piece.objects.all())
+    critiques_oui = [p for p in pieces if p.est_critique and p.criticite]
+    critiques_non = [p for p in pieces if p.est_critique and not p.criticite]
+    a_surveiller = [p for p in pieces if p.statut_stock == 'bas']
+
+    ws1 = wb.active
+    ws1.title = "Critiques OUI"
+    style_header(ws1, "FF0000", "FFFFFF")
+    add_pieces(ws1, critiques_oui, 'Critique')
+    auto_width(ws1)
+
+    ws2 = wb.create_sheet("Critiques NON")
+    style_header(ws2, "FFC107", "000000")
+    add_pieces(ws2, critiques_non, 'Critique')
+    auto_width(ws2)
+
+    ws3 = wb.create_sheet("A surveiller")
+    style_header(ws3, "0D6EFD", "FFFFFF")
+    add_pieces(ws3, a_surveiller, 'Stock bas')
+    auto_width(ws3)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="alertes_stock.xlsx"'
+    wb.save(response)
+    return response
 
     def auto_width(ws):
         for col in ws.columns:
@@ -422,8 +459,8 @@ def import_pieces_excel(request):
             erreurs = []
             for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
                 try:
-                    row_list = (list(row) + [None]*11)[:11]
-                    code, description, reference, emplacement, stock_reel, fournisseur, stock_min, stock_max, type_piece, statut, criticite = row_list
+                    row_list = (list(row) + [None]*13)[:13]
+                    code, description, reference, emplacement, stock_reel, fournisseur, stock_min, stock_max, type_piece, usine, prix, statut, criticite = row_list
                     if not reference or not description:
                         continue
                     type_map = {
@@ -432,7 +469,13 @@ def import_pieces_excel(request):
                         'électrique': 'electrique', 'electrique': 'electrique',
                         'autre': 'autre',
                     }
+                    usine_map = {
+                        'usine 1': 'usine_1', 'usine_1': 'usine_1',
+                        'usine 2': 'usine_2', 'usine_2': 'usine_2',
+                        'usine 3': 'usine_3', 'usine_3': 'usine_3',
+                    }
                     type_piece_val = type_map.get(str(type_piece).lower().strip(), 'mecanique') if type_piece else 'mecanique'
+                    usine_val = usine_map.get(str(usine).lower().strip(), 'usine_1') if usine else 'usine_1'
                     criticite_val = str(criticite).upper().strip() == 'OUI' if criticite else False
 
                     Piece.objects.update_or_create(
@@ -446,6 +489,8 @@ def import_pieces_excel(request):
                             'stock_minimum': int(float(str(stock_min))) if stock_min is not None else 0,
                             'stock_maximum': int(float(str(stock_max))) if stock_max is not None else 100,
                             'type_piece': type_piece_val,
+                            'usine': usine_val,
+                            'prix': float(str(prix)) if prix is not None else 0,
                             'criticite': criticite_val,
                         }
                     )

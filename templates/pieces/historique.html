@@ -38,6 +38,8 @@
                 <th>Code</th>
                 <th>Pièce</th>
                 <th>Référence</th>
+                <th>Usine</th>
+                <th>Prix (DH)</th>
                 <th>Type</th>
                 <th>Matricule</th>
                 <th>Quantité</th>
@@ -53,6 +55,12 @@
                 <td>{{ m.piece.description|truncatechars:30 }}</td>
                 <td><strong>{{ m.piece.reference }}</strong></td>
                 <td>
+                    {% if m.piece.usine == 'usine_1' %}🏭 Usine 1
+                    {% elif m.piece.usine == 'usine_2' %}🏭 Usine 2
+                    {% else %}🏭 Usine 3{% endif %}
+                </td>
+                <td class="text-muted small">{{ m.piece.prix }} DH</td>
+                <td>
                     {% if m.type_mouvement == 'consommation' %}
                     <span class="badge bg-warning text-dark"><i class="bi bi-arrow-down"></i> Consommation</span>
                     {% else %}
@@ -66,7 +74,7 @@
                 <td class="pe-3 text-muted small">{{ m.commentaire|default:"-" }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="10" class="text-center text-muted py-4">Aucun mouvement trouvé</td></tr>
+            <tr><td colspan="12" class="text-center text-muted py-4">Aucun mouvement trouvé</td></tr>
             {% endfor %}
             </tbody>
         </table>

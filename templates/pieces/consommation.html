@@ -64,32 +64,38 @@
             </div>
             <div class="card-body p-0">
                 <table class="table table-hover mb-0 small">
-                    <thead><tr>
-                        <th class="ps-3">Date</th>
-                        <th>Code</th>
-                        <th>Pièce</th>
-                        <th>Qté</th>
-                        <th>Avant</th>
-                        <th>Après</th>
-                        <th>Matricule</th>
-                        <th class="pe-3">Commentaire</th>
-                    </tr></thead>
+                <thead><tr>
+    <th class="ps-3">Date</th>
+    <th>Pièce</th>
+    <th>Usine</th>
+    <th>Prix (DH)</th>
+    <th>Qté</th>
+    <th>Avant</th>
+    <th>Après</th>
+    <th>Matricule</th>
+    <th class="pe-3">Commentaire</th>
+</tr></thead>
                     <tbody>
                     {% for m in historique %}
-                    <tr>
-                        <td class="ps-3 text-muted">{{ m.date|date:"d/m/y H:i" }}</td>
-                        <td><span class="badge bg-dark font-monospace">{{ m.piece.code }}</span></td>
-                        <td><strong>{{ m.piece.reference }}</strong><br>
-                            <span class="text-muted">{{ m.piece.description|truncatechars:25 }}</span></td>
-                        <td><span class="badge bg-warning text-dark">-{{ m.quantite }}</span></td>
-                        <td>{{ m.stock_avant }}</td>
-                        <td><strong class="{% if m.stock_apres <= m.piece.stock_minimum %}text-danger{% endif %}">{{ m.stock_apres }}</strong></td>
-                        <td>{{ m.matricule|default:"-" }}</td>
-                        <td class="pe-3 text-muted">{{ m.commentaire|truncatechars:20 }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="8" class="text-center text-muted py-4">Aucune consommation enregistrée</td></tr>
-                    {% endfor %}
+<tr>
+    <td class="ps-3 text-muted">{{ m.date|date:"d/m/y H:i" }}</td>
+    <td><strong>{{ m.piece.reference }}</strong><br>
+        <span class="text-muted">{{ m.piece.description|truncatechars:25 }}</span></td>
+    <td>
+        {% if m.piece.usine == 'usine_1' %} Usine 1
+        {% elif m.piece.usine == 'usine_2' %} Usine 2
+        {% else %} Usine 3{% endif %}
+    </td>
+    <td class="text-muted small">{{ m.piece.prix }} DH</td>
+    <td><span class="badge bg-warning text-dark">-{{ m.quantite }}</span></td>
+    <td>{{ m.stock_avant }}</td>
+    <td><strong class="{% if m.stock_apres <= m.piece.stock_minimum %}text-danger{% endif %}">{{ m.stock_apres }}</strong></td>
+    <td>{{ m.matricule|default:"-" }}</td>
+    <td class="pe-3 text-muted">{{ m.commentaire|truncatechars:20 }}</td>
+</tr>
+{% empty %}
+<tr><td colspan="9" class="text-center text-muted py-4">Aucune consommation enregistrée</td></tr>
+{% endfor %}
                     </tbody>
                 </table>
             </div>
